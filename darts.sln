@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "darts.Cli", "darts.Cli\darts.Cli.csproj", "{764ECCF8-ADD9-49D2-BF65-FE7032D655AE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "darts.Core", "darts.Core\darts.Core.csproj", "{B4605F5A-E633-4500-BA6A-34CA3BC8A031}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "darts.Entities", "darts.Entities\darts.Entities.csproj", "{A21E2282-CBBD-452B-A5C0-0F10CD13DD47}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{764ECCF8-ADD9-49D2-BF65-FE7032D655AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{764ECCF8-ADD9-49D2-BF65-FE7032D655AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{764ECCF8-ADD9-49D2-BF65-FE7032D655AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{764ECCF8-ADD9-49D2-BF65-FE7032D655AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4605F5A-E633-4500-BA6A-34CA3BC8A031}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4605F5A-E633-4500-BA6A-34CA3BC8A031}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4605F5A-E633-4500-BA6A-34CA3BC8A031}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4605F5A-E633-4500-BA6A-34CA3BC8A031}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A21E2282-CBBD-452B-A5C0-0F10CD13DD47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A21E2282-CBBD-452B-A5C0-0F10CD13DD47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A21E2282-CBBD-452B-A5C0-0F10CD13DD47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A21E2282-CBBD-452B-A5C0-0F10CD13DD47}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
