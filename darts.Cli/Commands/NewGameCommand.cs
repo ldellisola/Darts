@@ -1,7 +1,6 @@
 using System.ComponentModel;
 using System.Globalization;
 using darts.Core;
-using darts.Entities;
 using Spectre.Console;
 using Spectre.Console.Cli;
 
@@ -23,92 +22,62 @@ public class NewGameCommand : Command<NewGameSettings>
 
     public override int Execute(CommandContext context, NewGameSettings settings)
     {
-        var game = settings.Game ?? GetName();
+        // var game = settings.Game ?? GetName();
         var players = settings.Players ?? GetPlayers();
 
-        var _scores = new DartScore(players.Length);
+        var _scores = new DartScore(players);
+        var game = new CountDownGame(_scores,201);
 
-        _scores.OnScoreChanged += (tuple) => UpdateTableCell(tuple.round, tuple.player, tuple.value);
-        _scores.OnNewRound += tuple => AddTableRow(tuple.row,tuple.size);
-        _scores.OnSelectionChanged += (tuple) => SetTableCursor(tuple.previousCell, tuple.newCell);
-        _scores.OnTotalScoreChanged += tuple => UpdateScore(tuple.player, tuple.score);
+        game.OnScoreChanged += (tuple) => UpdateTableCell(tuple.round, tuple.player, tuple.value);
+        game.OnRoundAdded += AddTableRow;
+        game.OnScoreSelected += cell => SelectCell(cell.round,cell.player, cell.value);
+        game.OnScoreDeselected += cell => DeselectCell(cell.round,cell.player, cell.value);
+        game.OnTotalScoreChanged += UpdateScore;
+        game.OnPlayerWon +=  MarkPlayerAsWinner;
 
         AnsiConsole.MarkupLine($"Starting [green]{game}[/]");
         AnsiConsole.MarkupLine($"Players: {string.Join(", ", players)}");
 
-        _table.AddColumn("Round");
+        _ = _table.AddColumn("Round");
         foreach (var player in players)
         {
-            _table.AddColumn(player);
+            _ = _table.AddColumn(player);
         }
 
-        _table.AddRow(players.Select(_ => new Markup("   ")).Prepend(new Markup("[bold]Score[/]")));
+        _ = _table.AddRow(players.Select(_ => new Markup("   ")).Prepend(new Markup("[bold]Score[/]")));
+
+        game.Start();
 
         var liveDisplay = AnsiConsole.Live(_table);
 
-        _scores.NewRound();
         liveDisplay.Start(ct =>
         {
             ct.Refresh();
 
             while (true)
             {
-                var ch = Console.ReadKey(true);
-
-                switch (ch)
-                {
-                    case { Key: ConsoleKey.LeftArrow}:
-                    {
-                        _scores.PreviousPlayer();
-                        break;
-                    }
-                    case { Key: ConsoleKey.RightArrow}:
-                    {
-                        _scores.NextPlayer();
-                        break;
-                    }
-                    case { Key: ConsoleKey.UpArrow}:
-                    {
-                        _scores.PreviousRound();
-                        break;
-                    }
-                    case { Key: ConsoleKey.DownArrow}:
-                    {
-                        _scores.NextRound();
-                        break;
-                    }
-                    case { Key: ConsoleKey.Enter}:
-                    {
-                        _scores.NewRound();
-                        break;
-                    }
-                    case { KeyChar: >= '0' and <= '9'}:
-                    {
-                        _scores.UpdatePartialScore(ch.KeyChar - '0');
-                        break;
-                    }
-                    case { Key: ConsoleKey.Backspace}:
-                    {
-                        _scores.DeleteScore();
-                        break;
-                    }
-                    case { Key: ConsoleKey.Escape}:
-                    {
-                        return;
-                    }
-                }
-
-
                 ct.Refresh();
+                var ch = Console.ReadKey(true);
+                if (ch is {KeyChar: 'q'})
+                    break;
+                game.Consume(ch);
             }
         });
 
         return 1;
     }
-    private void SetTableCursor(ScoreCell previousCell, ScoreCell newCell)
+    private void MarkPlayerAsWinner(int column)
     {
-        _ = _table.UpdateCell(previousCell.round, previousCell.player + 1, previousCell.value?.ToString(CultureInfo.InvariantCulture) ?? "  ");
-        _ = _table.UpdateCell(newCell.round, newCell.player + 1, $"[reverse]{newCell.value?.ToString(CultureInfo.InvariantCulture) ?? "  "}[/]");
+        _ = _table.UpdateCell(_table.Rows.Count-1, column + 1, $"[bold][green]WINNER[/][/]");
+    }
+    private void DeselectCell(int row, int column, int? value)
+    {
+        _ = _table.UpdateCell(row, column + 1, value?.ToString(CultureInfo.InvariantCulture) ?? "  ");
+    }
+    private void SelectCell(int row, int column, int? value)
+    {
+        _ = _table.UpdateCell(row, column + 1, $"[reverse]{value?.ToString(CultureInfo.InvariantCulture) ?? "  "}[/]");
+
     }
     private void AddTableRow(int row, int size)
     {

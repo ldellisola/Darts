@@ -8,8 +8,7 @@ var app = new CommandApp(registrar);
 
 app.Configure(config =>
 {
-	config.AddCommand<HelloCommand>("hello");
-    config.AddCommand<NewGameCommand>("new");
+    _ = config.AddCommand<NewGameCommand>("new");
 });
 
 app.Run(args);
