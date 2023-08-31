@@ -1,3 +1,4 @@
+using System.Reflection.Metadata.Ecma335;
 using darts.Entities;
 
 namespace darts.Core;
@@ -20,13 +21,15 @@ public class CountDownGame : Game
     }
     protected override int GetPlayerScore(int player)
     {
-        return maxScore - Score.GetPlayerScore(player);
+        if(Score.TryGetPlayerScore(player, out var score))
+            return maxScore - score;
+        return maxScore;
     }
     private void CheckWinner()
     {
         var winners = Score.Players
             .WithIndex()
-            .Where((player) => Score.GetPlayerScore(player.Index) == maxScore)
+            .Where(player => Score.TryGetPlayerScore(player.Index, out var score) && score == maxScore)
             .Select(t=> t.Index)
             .ToArray();
 

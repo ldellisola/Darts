@@ -15,7 +15,8 @@ public class DartScore
     private int currentRound = -1;
     private int totalRounds;
 
-    public ScoreCell Current  => new (currentRound, currentPlayer, _scores[currentPlayer][currentRound]);
+    public ScoreCell CurrentRaw => new (currentRound, currentPlayer, _scores[currentPlayer][currentRound]);
+    public ScoreCell CurrentComputed => new(currentRound, currentPlayer, _mathInterpreter.TryResolve(_scores[currentPlayer][currentRound] ?? string.Empty, out var score) ? score.ToString() : null);
 
     public DartScore(string[] players)
     {
@@ -122,11 +123,19 @@ public class DartScore
     }
 
 
-    public int GetPlayerScore(int player)
+    public bool TryGetPlayerScore(int player, out int score)
     {
-        var (success, value) = _mathInterpreter.Resolve(_scores[player].Aggregate(new StringBuilder(), (sb, s) => sb.Append(s ?? "0")).ToString());
-        if (success is false)
-            return -1;
-        return value.Value;
+        var exp = new StringBuilder()
+                      .AppendJoin('+',player.se
+                                  )
+        var (success, value) = _mathInterpreter.Resolve(_scores[player].Aggregate(new StringBuilder(), (sb, s) => sb.Append('+').Append(s ?? "0")).ToString());
+        if(success is false)
+        {
+            score = 0;
+            return false;
+        }
+
+        score = value!.Value;
+        return true;
     }
 }

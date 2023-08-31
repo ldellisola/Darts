@@ -24,7 +24,7 @@ public abstract class Game
     {
         var totalRounds = Score.NewRound();
         OnRoundAdded?.Invoke(totalRounds, Score.Players.Length);
-        OnScoreSelected?.Invoke(Score.Current);
+        OnScoreSelected?.Invoke(Score.CurrentComputed);
 
         foreach (var (i,_) in Score.Players.WithIndex())
         {
@@ -38,51 +38,51 @@ public abstract class Game
         {
             case { Key: ConsoleKey.LeftArrow}:
             {
-                OnScoreDeselected?.Invoke(Score.Current);
+                OnScoreDeselected?.Invoke(Score.CurrentComputed);
                 Score.PreviousPlayer();
-                OnScoreSelected?.Invoke(Score.Current);
+                OnScoreSelected?.Invoke(Score.CurrentComputed);
                 break;
             }
             case { Key: ConsoleKey.RightArrow}:
             {
-                OnScoreDeselected?.Invoke(Score.Current);
+                OnScoreDeselected?.Invoke(Score.CurrentComputed);
                 Score.NextPlayer();
-                OnScoreSelected?.Invoke(Score.Current);
+                OnScoreSelected?.Invoke(Score.CurrentComputed);
                 break;
             }
             case { Key: ConsoleKey.UpArrow}:
             {
-                OnScoreDeselected?.Invoke(Score.Current);
+                OnScoreDeselected?.Invoke(Score.CurrentComputed);
                 Score.PreviousRound();
-                OnScoreSelected?.Invoke(Score.Current);
+                OnScoreSelected?.Invoke(Score.CurrentComputed);
                 break;
             }
             case { Key: ConsoleKey.DownArrow}:
             {
-                OnScoreDeselected?.Invoke(Score.Current);
+                OnScoreDeselected?.Invoke(Score.CurrentComputed);
                 Score.NextRound();
-                OnScoreSelected?.Invoke(Score.Current);
+                OnScoreSelected?.Invoke(Score.CurrentComputed);
                 break;
             }
             case { Key: ConsoleKey.Enter}:
             {
-                OnScoreDeselected?.Invoke(Score.Current);
+                OnScoreDeselected?.Invoke(Score.CurrentComputed);
                 var totalRounds = Score.NewRound();
                 OnRoundAdded?.Invoke(totalRounds, Score.Players.Length);
-                OnScoreSelected?.Invoke(Score.Current);
+                OnScoreSelected?.Invoke(Score.CurrentComputed);
                 break;
             }
             case {KeyChar: '+' or '*'}:
             case { KeyChar: >= '0' and <= '9'}:
             {
                 Score.UpdatePartialScore(keyInfo.KeyChar);
-                OnScoreChanged?.Invoke(Score.Current);
+                OnScoreChanged?.Invoke(Score.CurrentRaw);
                 break;
             }
             case { Key: ConsoleKey.Backspace}:
             {
                 Score.DeleteScore();
-                OnScoreChanged?.Invoke(Score.Current);
+                OnScoreChanged?.Invoke(Score.CurrentRaw);
                 break;
             }
         }
