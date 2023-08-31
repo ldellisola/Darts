@@ -1,10 +1,13 @@
+using System.Text;
+using darts.Core.Expression;
 using darts.Entities;
 
 namespace darts.Core;
 
 public class DartScore
 {
-    private readonly List<List<int?>> _scores;
+    private readonly List<List<string?>> _scores;
+    private readonly SimpleMathInterpreter _mathInterpreter = new();
     public string[] Players { get; }
     private readonly int _playersCount;
 
@@ -18,7 +21,7 @@ public class DartScore
     {
         Players = players;
         _playersCount = players.Length;
-        _scores = new(players.Select(_ => new List<int?>()));
+        _scores = new(players.Select(_ => new List<string?>()));
     }
 
     /// <summary>
@@ -39,12 +42,12 @@ public class DartScore
     /// </summary>
     /// <param name="score">Value to add</param>
     /// <returns>Player/round modified with the new value</returns>
-    public ScoreCell UpdatePartialScore(int score)
+    public ScoreCell UpdatePartialScore(char score)
     {
         if (_scores[currentPlayer][currentRound] is null)
-            _scores[currentPlayer][currentRound] = score;
-        else
-            _scores[currentPlayer][currentRound] = (_scores[currentPlayer][currentRound] * 10) + score;
+            _scores[currentPlayer][currentRound] = "";
+
+        _scores[currentPlayer][currentRound] += score;
 
         return new(currentRound, currentPlayer, _scores[currentPlayer][currentRound]);
     }
@@ -121,7 +124,9 @@ public class DartScore
 
     public int GetPlayerScore(int player)
     {
-        return _scores[player].Select(t=> t.GetValueOrDefault()).Sum();
+        var (success, value) = _mathInterpreter.Resolve(_scores[player].Aggregate(new StringBuilder(), (sb, s) => sb.Append(s ?? "0")).ToString());
+        if (success is false)
+            return -1;
+        return value.Value;
     }
-
 }

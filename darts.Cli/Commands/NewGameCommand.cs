@@ -18,7 +18,6 @@ public class NewGameSettings : CommandSettings
 }
 public class NewGameCommand : Command<NewGameSettings>
 {
-    private readonly Table _table = new();
 
     public override int Execute(CommandContext context, NewGameSettings settings)
     {
@@ -28,27 +27,12 @@ public class NewGameCommand : Command<NewGameSettings>
         var _scores = new DartScore(players);
         var game = new CountDownGame(_scores,201);
 
-        game.OnScoreChanged += (tuple) => UpdateTableCell(tuple.round, tuple.player, tuple.value);
-        game.OnRoundAdded += AddTableRow;
-        game.OnScoreSelected += cell => SelectCell(cell.round,cell.player, cell.value);
-        game.OnScoreDeselected += cell => DeselectCell(cell.round,cell.player, cell.value);
-        game.OnTotalScoreChanged += UpdateScore;
-        game.OnPlayerWon +=  MarkPlayerAsWinner;
-
         AnsiConsole.MarkupLine($"Starting [green]{game}[/]");
-        AnsiConsole.MarkupLine($"Players: {string.Join(", ", players)}");
-
-        _ = _table.AddColumn("Round");
-        foreach (var player in players)
-        {
-            _ = _table.AddColumn(player);
-        }
-
-        _ = _table.AddRow(players.Select(_ => new Markup("   ")).Prepend(new Markup("[bold]Score[/]")));
+        DartBoard.Initialize(game,players);
 
         game.Start();
 
-        var liveDisplay = AnsiConsole.Live(_table);
+        var liveDisplay = AnsiConsole.Live(DartBoard.Table);
 
         liveDisplay.Start(ct =>
         {
@@ -59,43 +43,17 @@ public class NewGameCommand : Command<NewGameSettings>
                 ct.Refresh();
                 var ch = Console.ReadKey(true);
                 if (ch is {KeyChar: 'q'})
+                {
                     break;
+                }
+
                 game.Consume(ch);
             }
         });
 
         return 1;
     }
-    private void MarkPlayerAsWinner(int column)
-    {
-        _ = _table.UpdateCell(_table.Rows.Count-1, column + 1, $"[bold][green]WINNER[/][/]");
-    }
-    private void DeselectCell(int row, int column, int? value)
-    {
-        _ = _table.UpdateCell(row, column + 1, value?.ToString(CultureInfo.InvariantCulture) ?? "  ");
-    }
-    private void SelectCell(int row, int column, int? value)
-    {
-        _ = _table.UpdateCell(row, column + 1, $"[reverse]{value?.ToString(CultureInfo.InvariantCulture) ?? "  "}[/]");
 
-    }
-    private void AddTableRow(int row, int size)
-    {
-        if (row >= _table.Rows.Count)
-        {
-            _ = _table.InsertRow(row-1,Enumerable.Repeat(new Markup("  "), size).Prepend(new Markup($"[bold]{row}[/]")));
-        }
-    }
-
-    private void UpdateTableCell(int row, int column, int? value)
-    {
-        _ = _table.UpdateCell(row, column + 1, $"[reverse]{value?.ToString(CultureInfo.InvariantCulture) ?? "  "}[/]");
-    }
-
-    private void UpdateScore(int column, int score)
-    {
-        _ = _table.UpdateCell(_table.Rows.Count-1, column + 1, $"[bold]{score}[/]");
-    }
 
     private static string[] GetPlayers()
     {

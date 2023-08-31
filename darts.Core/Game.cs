@@ -72,9 +72,10 @@ public abstract class Game
                 OnScoreSelected?.Invoke(Score.Current);
                 break;
             }
+            case {KeyChar: '+' or '*'}:
             case { KeyChar: >= '0' and <= '9'}:
             {
-                Score.UpdatePartialScore(keyInfo.KeyChar - '0');
+                Score.UpdatePartialScore(keyInfo.KeyChar);
                 OnScoreChanged?.Invoke(Score.Current);
                 break;
             }
