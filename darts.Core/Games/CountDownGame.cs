@@ -1,7 +1,4 @@
-using System.Reflection.Metadata.Ecma335;
-using darts.Entities;
-
-namespace darts.Core;
+namespace darts.Core.Games;
 
 public class CountDownGame : Game
 {

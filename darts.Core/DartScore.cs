@@ -13,7 +13,7 @@ public class DartScore
 
     private int currentPlayer;
     private int currentRound = -1;
-    private int totalRounds;
+    public int TotalRounds { get; private set; }
 
     public ScoreCell CurrentRaw => new (currentRound, currentPlayer, _scores[currentPlayer][currentRound]);
     public ScoreCell CurrentComputed => new(currentRound, currentPlayer, _mathInterpreter.TryResolve(_scores[currentPlayer][currentRound] ?? string.Empty, out var score) ? score.ToString() : null);
@@ -34,8 +34,8 @@ public class DartScore
         foreach (var playerScore in _scores)
             playerScore.Add(null);
         currentRound++;
-        totalRounds++;
-        return totalRounds;
+        TotalRounds++;
+        return TotalRounds;
     }
 
     /// <summary>
@@ -88,7 +88,7 @@ public class DartScore
     /// <returns>Player/round modified with the current value</returns>
     public ScoreCell? NextRound()
     {
-        if (currentRound < totalRounds - 1)
+        if (currentRound < TotalRounds - 1)
         {
             currentRound++;
             return new(currentRound, currentPlayer, _scores[currentPlayer][currentRound]);
@@ -126,16 +126,31 @@ public class DartScore
     public bool TryGetPlayerScore(int player, out int score)
     {
         var exp = new StringBuilder()
-                      .AppendJoin('+',player.se
-                                  )
-        var (success, value) = _mathInterpreter.Resolve(_scores[player].Aggregate(new StringBuilder(), (sb, s) => sb.Append('+').Append(s ?? "0")).ToString());
-        if(success is false)
+            .AppendJoin('+', _scores[player].Select(s => s ?? "0"))
+            .ToString();
+
+        if (_mathInterpreter.TryResolve(exp, out int result))
         {
-            score = 0;
+            score = result;
+            return true;
+        }
+        score = -1;
+        return false;
+    }
+
+    public bool TryGetPlayerScore(int player, int round, out int score)
+    {
+        if (_scores[player][round] is null)
+        {
+            score = -1;
             return false;
         }
 
-        score = value!.Value;
-        return true;
+        if (_mathInterpreter.TryResolve(_scores[player][round]!, out score))
+        {
+            return true;
+        }
+        score = -1;
+        return false;
     }
 }

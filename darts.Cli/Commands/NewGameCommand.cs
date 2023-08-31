@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Globalization;
 using darts.Core;
+using darts.Core.Games;
 using Spectre.Console;
 using Spectre.Console.Cli;
 
@@ -8,7 +9,7 @@ namespace darts.Cli.Commands;
 
 public class NewGameSettings : CommandSettings
 {
-    [CommandOption( "-g|--game <GAME>")]
+    [CommandOption("-g|--game <GAME>")]
     [DefaultValue(null)]
     public string? Game { get; set; }
 
@@ -21,14 +22,19 @@ public class NewGameCommand : Command<NewGameSettings>
 
     public override int Execute(CommandContext context, NewGameSettings settings)
     {
-        // var game = settings.Game ?? GetName();
+        var gameName = settings.Game ?? GetGame();
         var players = settings.Players ?? GetPlayers();
+        AnsiConsole.MarkupLine($"Starting [green]{gameName}[/]");
 
-        var _scores = new DartScore(players);
-        var game = new CountDownGame(_scores,201);
+        var game = gameName.ToLowerInvariant() switch
+        {
+            "201" => Start201(players),
+            "501" => Start501(players),
+            "knockout" => StartKnockout(players),
+            "high score" => StartHighScore(players),
+            _ => throw new NotSupportedException($"Game {gameName} is not supported")
+        };
 
-        AnsiConsole.MarkupLine($"Starting [green]{game}[/]");
-        DartBoard.Initialize(game,players);
 
         game.Start();
 
@@ -53,6 +59,35 @@ public class NewGameCommand : Command<NewGameSettings>
 
         return 1;
     }
+    private static Game StartHighScore(string[] players)
+    {
+        var game = new HighScoreGame(players);
+        DartBoard.Initialize(game,players);
+        return game;
+    }
+
+
+    private static Game StartKnockout(string[] players)
+    {
+        var game = new KnockoutGame(players);
+        DartBoard.Initialize(game,players);
+        return game;
+    }
+    private static Game Start201(string[] players)
+    {
+        var _scores = new DartScore(players);
+        var game = new CountDownGame(_scores,201);
+        DartBoard.Initialize(game,players);
+        return game;
+    }
+
+    private static Game Start501(string[] players)
+    {
+        var _scores = new DartScore(players);
+        var game = new CountDownGame(_scores,501);
+        DartBoard.Initialize(game,players);
+        return game;
+    }
 
 
     private static string[] GetPlayers()
@@ -71,14 +106,13 @@ public class NewGameCommand : Command<NewGameSettings>
 
         return players.ToArray();
     }
-    private static string GetName()
+    private static string GetGame()
     {
-        while (true)
-        {
-            AnsiConsole.MarkupLine("What is the name of the game?");
-            var readLine = Console.ReadLine();
-            if (readLine is not null)
-                return readLine;
-        }
+        return AnsiConsole.Prompt(
+            new SelectionPrompt<string>()
+                .PageSize(10)
+                .Title("Select a game")
+                .AddChoices(new[] { "201", "501", "Knockout", "High Score"})
+        );
     }
 }

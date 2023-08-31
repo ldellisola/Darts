@@ -1,5 +1,6 @@
 using System.Globalization;
 using darts.Core;
+using darts.Core.Games;
 using Spectre.Console;
 
 namespace darts.Cli;
@@ -8,13 +9,28 @@ public static class DartBoard
 {
     public static Table Table { get; } = new();
 
+    public static void Initialize(KnockoutGame game, string[] players)
+    {
+        game.OnPlayerEliminated += (player) => _ = Table.UpdateCell(player.round, player.player + 1, $"[red]{player.value}[/]");
+        game.OnScoreChanged += (tuple) => UpdateTableCell(tuple.round, tuple.player, tuple.value);
+        game.OnRoundAdded += AddTableRow;
+        game.OnScoreSelected += cell => SelectCell(cell.round,cell.player, cell.value is not null && game.IsPlayerEliminated(cell.player) ? $"[red]{cell.value}[/]": cell.value);
+        game.OnScoreDeselected += cell => DeselectCell(cell.round,cell.player, cell.value is not null && game.IsPlayerEliminated(cell.player) ? $"[red]{cell.value}[/]": cell.value);
+
+
+        _ = Table.AddColumn("Round");
+        foreach (var player in players)
+        {
+            _ = Table.AddColumn(player);
+        }
+    }
+
     public static void Initialize(Game game, string[] players)
     {
         game.OnScoreChanged += (tuple) => UpdateTableCell(tuple.round, tuple.player, tuple.value);
         game.OnRoundAdded += AddTableRow;
         game.OnScoreSelected += cell => SelectCell(cell.round,cell.player, cell.value);
         game.OnScoreDeselected += cell => DeselectCell(cell.round,cell.player, cell.value);
-        game.OnTotalScoreChanged += UpdateScore;
         game.OnPlayerWon += MarkPlayerAsWinner;
 
         _ = Table.AddColumn("Round");
@@ -22,7 +38,7 @@ public static class DartBoard
         {
             _ = Table.AddColumn(player);
         }
-
+        game.OnTotalScoreChanged += UpdateScore;
         _ = Table.AddRow(players.Select(_ => new Markup("   ")).Prepend(new Markup("[bold]Score[/]")));
     }
 
@@ -32,11 +48,11 @@ public static class DartBoard
     }
     private static void DeselectCell(int row, int column, string? value)
     {
-        _ = Table.UpdateCell(row, column + 1, value?.ToString(CultureInfo.InvariantCulture) ?? "  ");
+        _ = Table.UpdateCell(row, column + 1, value ?? "  ");
     }
     private static void SelectCell(int row, int column, string? value)
     {
-        _ = Table.UpdateCell(row, column + 1, $"[reverse]{value?.ToString(CultureInfo.InvariantCulture) ?? "  "}[/]");
+        _ = Table.UpdateCell(row, column + 1, $"[reverse]{value ?? "  "}[/]");
 
     }
     private static void AddTableRow(int row, int size)
@@ -49,7 +65,7 @@ public static class DartBoard
 
     private static void UpdateTableCell(int row, int column, string? value)
     {
-        _ = Table.UpdateCell(row, column + 1, $"[reverse]{value?.ToString(CultureInfo.InvariantCulture) ?? "  "}[/]");
+        _ = Table.UpdateCell(row, column + 1, $"[reverse]{value ?? "  "}[/]");
     }
 
     private static void UpdateScore(int column, int score)

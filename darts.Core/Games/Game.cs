@@ -1,6 +1,6 @@
 using darts.Entities;
 
-namespace darts.Core;
+namespace darts.Core.Games;
 
 public abstract class Game
 {
@@ -38,38 +38,27 @@ public abstract class Game
         {
             case { Key: ConsoleKey.LeftArrow}:
             {
-                OnScoreDeselected?.Invoke(Score.CurrentComputed);
-                Score.PreviousPlayer();
-                OnScoreSelected?.Invoke(Score.CurrentComputed);
+                GoToPreviousPlayer();
                 break;
             }
             case { Key: ConsoleKey.RightArrow}:
             {
-                OnScoreDeselected?.Invoke(Score.CurrentComputed);
-                Score.NextPlayer();
-                OnScoreSelected?.Invoke(Score.CurrentComputed);
+                GoToNextPlayer();
                 break;
             }
             case { Key: ConsoleKey.UpArrow}:
             {
-                OnScoreDeselected?.Invoke(Score.CurrentComputed);
-                Score.PreviousRound();
-                OnScoreSelected?.Invoke(Score.CurrentComputed);
+                GoToPreviousRound();
                 break;
             }
             case { Key: ConsoleKey.DownArrow}:
             {
-                OnScoreDeselected?.Invoke(Score.CurrentComputed);
-                Score.NextRound();
-                OnScoreSelected?.Invoke(Score.CurrentComputed);
+                GoToNextRound();
                 break;
             }
             case { Key: ConsoleKey.Enter}:
             {
-                OnScoreDeselected?.Invoke(Score.CurrentComputed);
-                var totalRounds = Score.NewRound();
-                OnRoundAdded?.Invoke(totalRounds, Score.Players.Length);
-                OnScoreSelected?.Invoke(Score.CurrentComputed);
+                CreateNewRound();
                 break;
             }
             case {KeyChar: '+' or '*'}:
@@ -86,6 +75,47 @@ public abstract class Game
                 break;
             }
         }
+    }
+    protected virtual void CreateNewRound()
+    {
+
+        if (Score.Players.WithIndex()
+            .Aggregate(true, (b, tuple) => b && !Score.TryGetPlayerScore(tuple.Index, Score.TotalRounds - 1, out _)))
+        {
+            return;
+        }
+
+        OnScoreDeselected?.Invoke(Score.CurrentComputed);
+        var totalRounds = Score.NewRound();
+        OnRoundAdded?.Invoke(totalRounds, Score.Players.Length);
+        OnScoreSelected?.Invoke(Score.CurrentComputed);
+    }
+    protected virtual void GoToNextRound()
+    {
+        OnScoreDeselected?.Invoke(Score.CurrentComputed);
+        Score.NextRound();
+        OnScoreSelected?.Invoke(Score.CurrentComputed);
+    }
+    protected virtual void GoToPreviousRound()
+    {
+
+        OnScoreDeselected?.Invoke(Score.CurrentComputed);
+        Score.PreviousRound();
+        OnScoreSelected?.Invoke(Score.CurrentComputed);
+    }
+    protected virtual void GoToNextPlayer()
+    {
+
+        OnScoreDeselected?.Invoke(Score.CurrentComputed);
+        Score.NextPlayer();
+        OnScoreSelected?.Invoke(Score.CurrentComputed);
+    }
+    protected virtual void GoToPreviousPlayer()
+    {
+
+        OnScoreDeselected?.Invoke(Score.CurrentComputed);
+        Score.PreviousPlayer();
+        OnScoreSelected?.Invoke(Score.CurrentComputed);
     }
 
     protected abstract int GetPlayerScore(int player);
