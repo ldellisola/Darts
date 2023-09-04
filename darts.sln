@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "darts.Cli", "darts.Cli\darts.Cli.csproj", "{764ECCF8-ADD9-49D2-BF65-FE7032D655AE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Darts.Cli", "Darts.Cli\Darts.Cli.csproj", "{764ECCF8-ADD9-49D2-BF65-FE7032D655AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "darts.Core", "darts.Core\darts.Core.csproj", "{B4605F5A-E633-4500-BA6A-34CA3BC8A031}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Darts.Core", "Darts.Core\Darts.Core.csproj", "{B4605F5A-E633-4500-BA6A-34CA3BC8A031}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "darts.Entities", "darts.Entities\darts.Entities.csproj", "{A21E2282-CBBD-452B-A5C0-0F10CD13DD47}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Darts.Entities", "Darts.Entities\Darts.Entities.csproj", "{A21E2282-CBBD-452B-A5C0-0F10CD13DD47}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
