@@ -4,10 +4,11 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <RootNamespace>Darts.Core1</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\darts.Entities\darts.Entities.csproj" />
+    <ProjectReference Include="..\Darts.Entities\Darts.Entities.csproj" />
   </ItemGroup>
 
     <ItemGroup>

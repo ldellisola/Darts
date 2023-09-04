@@ -1,8 +1,6 @@
-﻿using darts.Cli.Commands;
+﻿using Darts.Cli.Commands;
 using darts.Cli.Infrastructure;
 using Spectre.Console.Cli;
-
-
 
 var registrar = new TypeRegistrar();
 
@@ -10,7 +8,10 @@ var app = new CommandApp(registrar);
 
 app.Configure(config =>
 {
-    _ = config.AddCommand<NewGameCommand>("new");
+    config.AddCommand<NewGameCommand>("new");
+    config.AddCommand<ClassicGameCommand>("classic");
+    config.AddCommand<KnockoutGameCommand>("knockout");
+    config.AddCommand<RoundsGameCommand>("rounds");
 });
 
 app.Run(args);

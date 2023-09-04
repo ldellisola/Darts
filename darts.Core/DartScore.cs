@@ -1,8 +1,8 @@
 using System.Text;
-using darts.Core.Expression;
-using darts.Entities;
+using Darts.Core.Expression;
+using Darts.Entities;
 
-namespace darts.Core;
+namespace Darts.Core;
 
 public class DartScore
 {

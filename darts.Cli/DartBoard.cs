@@ -1,9 +1,6 @@
-using System.Globalization;
-using darts.Core;
-using darts.Core.Games;
 using Spectre.Console;
 
-namespace darts.Cli;
+namespace Darts.Cli;
 
 public static class DartBoard
 {
@@ -42,19 +39,9 @@ public static class DartBoard
         _ = Table.AddRow(players.Select(_ => new Markup("   ")).Prepend(new Markup("[bold]Score[/]")));
     }
 
-    private static void MarkPlayerAsWinner(int column)
-    {
-        _ = Table.UpdateCell(Table.Rows.Count-1, column + 1, $"[bold][green]WINNER[/][/]");
-    }
-    private static void DeselectCell(int row, int column, string? value)
-    {
-        _ = Table.UpdateCell(row, column + 1, value ?? "  ");
-    }
-    private static void SelectCell(int row, int column, string? value)
-    {
-        _ = Table.UpdateCell(row, column + 1, $"[reverse]{value ?? "  "}[/]");
-
-    }
+    private static void MarkPlayerAsWinner(int column) => Table.UpdateCell(Table.Rows.Count - 1, column + 1, $"[bold][green]WINNER[/][/]");
+    private static void DeselectCell(int row, int column, string? value) => Table.UpdateCell(row, column + 1, value ?? "  ");
+    private static void SelectCell(int row, int column, string? value) => Table.UpdateCell(row, column + 1, $"[reverse]{value ?? "  "}[/]");
     private static void AddTableRow(int row, int size)
     {
         if (row >= Table.Rows.Count)
@@ -63,13 +50,7 @@ public static class DartBoard
         }
     }
 
-    private static void UpdateTableCell(int row, int column, string? value)
-    {
-        _ = Table.UpdateCell(row, column + 1, $"[reverse]{value ?? "  "}[/]");
-    }
+    private static void UpdateTableCell(int row, int column, string? value) => Table.UpdateCell(row, column + 1, $"[reverse]{value ?? "  "}[/]");
 
-    private static void UpdateScore(int column, int score)
-    {
-        _ = Table.UpdateCell(Table.Rows.Count-1, column + 1, $"[bold]{score}[/]");
-    }
+    private static void UpdateScore(int column, int score) => Table.UpdateCell(Table.Rows.Count - 1, column + 1, $"[bold]{score}[/]");
 }

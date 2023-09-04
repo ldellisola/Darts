@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>default</LangVersion>
+    <RootNamespace>darts.Cli</RootNamespace>
   </PropertyGroup>
 
     <PropertyGroup>
@@ -15,7 +16,7 @@
 
 
     <ItemGroup>
-    <ProjectReference Include="..\darts.Core\darts.Core.csproj" />
+    <ProjectReference Include="..\Darts.Core\Darts.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

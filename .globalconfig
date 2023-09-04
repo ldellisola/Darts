@@ -3,7 +3,17 @@ is_global = true
 dotnet_diagnostic.CS0219.severity = none
 dotnet_diagnostic.CS8765.severity = info
 dotnet_diagnostic.IDE0008.severity = none
-s
+dotnet_diagnostic.IDE0055.severity = none
+
+csharp_style_namespace_declarations = file_scoped
+csharp_style_var_for_built_in_types = true
+csharp_style_var_when_type_is_apparent = true
+csharp_prefer_braces = when_multiline
+csharp_style_expression_bodied_constructors = when_on_single_line
+csharp_style_expression_bodied_methods = when_on_single_line
+csharp_style_expression_bodied_operators = when_on_single_line
+
+
 dotnet_analyzer_diagnostic.category-Design.severity = warning
 dotnet_analyzer_diagnostic.category-Documentation.severity = warning
 dotnet_analyzer_diagnostic.category-Maintainability.severity = warning

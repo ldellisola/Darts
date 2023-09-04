@@ -1,4 +1,4 @@
-namespace darts.Core.Expression;
+namespace Darts.Core.Expression;
 
 public abstract class Node
 {

@@ -1,6 +1,6 @@
-using darts.Entities;
+using Darts.Entities;
 
-namespace darts.Core.Games;
+namespace Darts.Core.Games;
 
 public abstract class Game
 {

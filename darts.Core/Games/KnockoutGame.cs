@@ -1,15 +1,17 @@
-using darts.Entities;
+using Darts.Entities;
 
-namespace darts.Core.Games;
+namespace Darts.Core.Games;
 
 public class KnockoutGame : Game
 {
+    private readonly int _dropLast;
 
     public event Action<ScoreCell>? OnPlayerEliminated;
     private bool[] _playerStatus;
 
-    public KnockoutGame(string[] players) : base(new DartScore(players))
+    public KnockoutGame(string[] players, int dropLast) : base(new DartScore(players))
     {
+        _dropLast = dropLast;
         _playerStatus = new bool[players.Length];
     }
 
@@ -21,26 +23,28 @@ public class KnockoutGame : Game
 
         for (int round = 0; round < totalRounds; round++)
         {
-            var lowestScore = (Player: -1, Score: int.MaxValue);
-            foreach (var (i,p) in Score.Players.WithIndex())
+            var playerScores = new List<(int Player, int Score)>();
+
+            foreach (var (i, _) in Score.Players.WithIndex())
             {
                 if (Score.TryGetPlayerScore(i, round, out var score))
                 {
-                    if (score < lowestScore.Score)
-                        lowestScore = (i, score);
-
+                    playerScores.Add((i, score));
                 }
                 else if (!IsPlayerEliminated(i))
                 {
-                    lowestScore = (-1, int.MaxValue);
+                    playerScores.Clear();
                     break;
                 }
             }
 
-            if (lowestScore.Player is not -1)
+            playerScores.Sort((a, b) => a.Score.CompareTo(b.Score)); // Sort in ascending order of scores
+
+            // Take the first N players (lowest scores) to eliminate
+            foreach (var eliminated in playerScores.Take(_dropLast))
             {
-                OnPlayerEliminated?.Invoke(new ScoreCell(round, lowestScore.Player, lowestScore.Score.ToString()));
-                _playerStatus[lowestScore.Player] = true;
+                OnPlayerEliminated?.Invoke(new ScoreCell(round, eliminated.Player, eliminated.Score.ToString()));
+                _playerStatus[eliminated.Player] = true;
             }
         }
     }

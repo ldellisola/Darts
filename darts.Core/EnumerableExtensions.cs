@@ -1,4 +1,4 @@
-namespace darts.Core;
+namespace Darts.Core;
 
 public static class EnumerableExtensions
 {

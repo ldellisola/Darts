@@ -1,8 +1,8 @@
-namespace darts.Cli.Infrastructure;
 
 using Microsoft.Extensions.DependencyInjection;
 using Spectre.Console.Cli;
 
+namespace darts.Cli.Infrastructure;
 /// <summary>
 /// Dependency injection registrar.
 /// </summary>
@@ -13,25 +13,13 @@ internal class TypeRegistrar : ITypeRegistrar
     /// <summary>
     /// Initializes a new instance of the <see cref="TypeRegistrar"/> class.
     /// </summary>
-    public TypeRegistrar()
-    {
-        builder = new ServiceCollection();
-    }
+    public TypeRegistrar() => builder = new ServiceCollection();
 
-    public ITypeResolver Build()
-    {
-        return new TypeResolver(builder.BuildServiceProvider());
-    }
+    public ITypeResolver Build() => new TypeResolver(builder.BuildServiceProvider());
 
-    public void Register(Type service, Type implementation)
-    {
-        builder.AddSingleton(service, implementation);
-    }
+    public void Register(Type service, Type implementation) => builder.AddSingleton(service, implementation);
 
-    public void RegisterInstance(Type service, object implementation)
-    {
-        builder.AddSingleton(service, implementation);
-    }
+    public void RegisterInstance(Type service, object implementation) => builder.AddSingleton(service, implementation);
 
     public void RegisterLazy(Type service, Func<object> func)
     {

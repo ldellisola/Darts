@@ -1,10 +1,10 @@
-namespace darts.Core.Games;
+namespace Darts.Core.Games;
 
-public class CountDownGame : Game
+public class ClassicGame : Game
 {
     private readonly int maxScore;
 
-    public CountDownGame(DartScore score, int maxScore) : base(score)
+    public ClassicGame(string[] players, int maxScore) : base(new DartScore(players))
     {
         this.maxScore = maxScore;
         OnScoreChanged += (cell) => ExecuteOnTotalScoreChanged(cell.player);
