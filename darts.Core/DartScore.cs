@@ -16,7 +16,7 @@ public class DartScore
     public int TotalRounds { get; private set; }
 
     public ScoreCell CurrentRaw => new (currentRound, currentPlayer, _scores[currentPlayer][currentRound]);
-    public ScoreCell CurrentComputed => new(currentRound, currentPlayer, _mathInterpreter.TryResolve(_scores[currentPlayer][currentRound] ?? string.Empty, out var score) ? score.ToString() : null);
+    public ScoreCell CurrentComputed => new(currentRound, currentPlayer, SimpleMathInterpreter.TryResolve(_scores[currentPlayer][currentRound] ?? string.Empty, out var score) ? score.ToString() : null);
 
     public DartScore(string[] players)
     {
@@ -130,7 +130,7 @@ public class DartScore
             .AppendJoin('+', _scores[player].Select(s => s ?? "0"))
             .ToString();
 
-        if (_mathInterpreter.TryResolve(exp, out int result))
+        if (SimpleMathInterpreter.TryResolve(exp, out int result))
         {
             score = result;
             return true;
@@ -147,7 +147,7 @@ public class DartScore
             return false;
         }
 
-        if (_mathInterpreter.TryResolve(_scores[player][round]!, out score))
+        if (SimpleMathInterpreter.TryResolve(_scores[player][round]!, out score))
         {
             return true;
         }

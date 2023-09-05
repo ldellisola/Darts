@@ -4,13 +4,13 @@ public class SimpleMathInterpreter
 {
 
 
-    public bool TryResolve(string expression, out int result)
+    public static bool TryResolve(string expression, out int result)
     {
         var (success, value) = Resolve(expression);
         result = value ?? 0;
         return success;
     }
-    public (bool Success, int? Value) Resolve(string expression)
+    private static (bool Success, int? Value) Resolve(string expression)
     {
         try
         {
