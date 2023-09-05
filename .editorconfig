@@ -9,6 +9,7 @@ indent_style = space
 indent_size = 4
 trim_trailing_whitespace = true
 max_line_length = 150
+dotnet_diagnostic.IDE0058.severity = none
 
 [*.g.cs]
 generated_code = true

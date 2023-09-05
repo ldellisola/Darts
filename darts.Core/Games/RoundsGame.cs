@@ -10,6 +10,13 @@ public class RoundsGame : Game
 
         return 0;
     }
+
+    protected override Dictionary<string, object?> GetGameState()
+        => new()
+           {
+               {"Rounds", _rounds}
+           };
+
     public RoundsGame(string[] players, int rounds) : base(new DartScore(players))
     {
         _rounds = rounds;

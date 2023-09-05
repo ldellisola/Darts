@@ -41,12 +41,15 @@ public class KnockoutGame : Game
             playerScores.Sort((a, b) => a.Score.CompareTo(b.Score)); // Sort in ascending order of scores
 
             // Take the first N players (lowest scores) to eliminate
-            foreach (var eliminated in playerScores.Take(_dropLast))
+            foreach (var eliminated in playerScores.Take(Math.Min(_dropLast, playerScores.Count-1)))
             {
                 OnPlayerEliminated?.Invoke(new ScoreCell(round, eliminated.Player, eliminated.Score.ToString()));
                 _playerStatus[eliminated.Player] = true;
             }
         }
+
+        if (_playerStatus.Count(t=> !t) == 1)
+            Winner = _playerStatus.ToList().IndexOf(false);
     }
 
     public override void Consume(ConsoleKeyInfo keyInfo)
@@ -90,4 +93,10 @@ public class KnockoutGame : Game
     {
         throw new NotSupportedException("Knockout game does not support player score");
     }
+
+    protected override Dictionary<string, object?> GetGameState()
+        => new()
+           {
+               {"DropLast", _dropLast},
+           } ;
 }

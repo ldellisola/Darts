@@ -14,7 +14,6 @@ public static class DartBoard
         game.OnScoreSelected += cell => SelectCell(cell.round,cell.player, cell.value is not null && game.IsPlayerEliminated(cell.player) ? $"[red]{cell.value}[/]": cell.value);
         game.OnScoreDeselected += cell => DeselectCell(cell.round,cell.player, cell.value is not null && game.IsPlayerEliminated(cell.player) ? $"[red]{cell.value}[/]": cell.value);
 
-
         _ = Table.AddColumn("Round");
         foreach (var player in players)
         {

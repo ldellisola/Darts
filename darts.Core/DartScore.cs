@@ -153,4 +153,22 @@ public class DartScore
         score = -1;
         return false;
     }
+
+    public int[][] GetScores()
+    {
+        var scores = new int[_playersCount][];
+        for (var i = 0; i < _playersCount; i++)
+        {
+            scores[i] = new int[TotalRounds];
+            for (var j = 0; j < TotalRounds; j++)
+            {
+                if (TryGetPlayerScore(i, j, out var score))
+                {
+                    scores[i][j] = score;
+                }
+            }
+        }
+
+        return scores;
+    }
 }

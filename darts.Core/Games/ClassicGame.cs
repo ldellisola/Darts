@@ -10,19 +10,20 @@ public class ClassicGame : Game
         OnScoreChanged += (cell) => ExecuteOnTotalScoreChanged(cell.player);
     }
 
-    public override void Consume(ConsoleKeyInfo keyInfo)
-    {
-        base.Consume(keyInfo);
-        if (keyInfo.Key == ConsoleKey.Enter)
-            CheckWinner();
-    }
     protected override int GetPlayerScore(int player)
     {
         if(Score.TryGetPlayerScore(player, out var score))
             return maxScore - score;
         return maxScore;
     }
-    private void CheckWinner()
+
+    protected override Dictionary<string, object?> GetGameState()
+        => new()
+           {
+               {"MaxScore", maxScore}
+           } ;
+
+    private bool CheckWinner()
     {
         var winners = Score.Players
             .WithIndex()
@@ -33,6 +34,18 @@ public class ClassicGame : Game
         if (winners.Any())
         {
             Winner = winners.First();
+            return true;
+        }
+
+        return false;
+    }
+
+    protected override void CreateNewRound()
+    {
+        if (CheckWinner() is false)
+        {
+            base.CreateNewRound();
         }
     }
+
 }
