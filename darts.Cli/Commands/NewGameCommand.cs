@@ -21,7 +21,7 @@ public class NewGameCommand : Command<NewGameSettings>
         {
             "classic" => new ClassicGameCommand().Execute(context, new ClassicGameSettings { Players = settings.Players }),
             "knockout" => new KnockoutGameCommand().Execute(context, new KnockoutGameSettings { Players = settings.Players }),
-            "rounds" => new RoundsGameCommand().Execute(context, new RoundsGameSettings { Players = settings.Players }),
+            "totaler" => new TotalerGameCommand().Execute(context, new TotalerGameSettings { Players = settings.Players }),
             _ => throw new NotSupportedException($"Game {gameName} is not supported")
         };
     }

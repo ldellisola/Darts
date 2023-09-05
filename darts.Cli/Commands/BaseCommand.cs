@@ -29,7 +29,7 @@ public abstract class BaseCommand<T> : Command<T> where T : NewGameSettings
                                           }
                                       });
 
-        File.WriteAllText(Path.Combine(Environment.CurrentDirectory, $"game_{DateTime.Now}.json"), game.ToJson());
+        File.WriteAllText(Path.Combine(Environment.CurrentDirectory, $"game_{DateTime.Now:yy-MM-dd-hh-mm-ss}.json"), game.ToJson());
 
        // AnsiConsole.Write(
        //                   new Panel( new JsonText(game.ToJson()))

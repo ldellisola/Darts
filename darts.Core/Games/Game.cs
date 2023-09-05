@@ -27,7 +27,7 @@ public abstract class Game
         OnPlayerWon += i => _winner = Score.Players[i];
     }
 
-    public void Start()
+    public virtual void Start()
     {
         var totalRounds = Score.NewRound();
         OnRoundAdded?.Invoke(totalRounds, Score.Players.Length);
@@ -61,6 +61,11 @@ public abstract class Game
             case { Key: ConsoleKey.DownArrow }:
             {
                 GoToNextRound();
+                break;
+            }
+            case { Key: ConsoleKey.Spacebar }:
+            {
+                OnScoreChanged?.Invoke(Score.CurrentRaw);
                 break;
             }
             case { Key: ConsoleKey.Enter }:
@@ -144,7 +149,8 @@ public abstract class Game
                         { "Players", Score.Players },
                         { "Winner", _winner },
                         { "Score", Score.GetScores() },
-                        { "Type", GetType().Name }
+                        { "Type", GetType().Name },
+                        { "Date", DateTime.Now }
                     };
 
         return JsonSerializer.Serialize(GetGameState().Union(state).ToDictionary(t => t.Key, t => t.Value), options);

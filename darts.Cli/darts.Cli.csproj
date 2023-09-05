@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>default</LangVersion>
-    <RootNamespace>darts.Cli</RootNamespace>
+    <RootNamespace>Darts.Cli</RootNamespace>
   </PropertyGroup>
 
     <PropertyGroup>

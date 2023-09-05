@@ -118,7 +118,8 @@ public class DartScore
     /// <returns>Player/round modified with the current value</returns>
     public ScoreCell DeleteScore()
     {
-        _scores[currentPlayer][currentRound] = null;
+        if (_scores[currentPlayer][currentRound] is not null && _scores[currentPlayer][currentRound]!.Length > 0)
+            _scores[currentPlayer][currentRound] = _scores[currentPlayer][currentRound]?[..^1];
         return new(currentRound, currentPlayer, _scores[currentPlayer][currentRound]);
     }
 

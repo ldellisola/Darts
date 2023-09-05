@@ -4,23 +4,24 @@ using Spectre.Console.Cli;
 
 namespace Darts.Cli.Commands;
 
-public class RoundsGameSettings : NewGameSettings
+public class RounderGameSettings : NewGameSettings
 {
     [ CommandOption("-r|--rounds <ROUNDS>") ]
     [ DefaultValue(3) ]
     public int? Rounds { get; set; }
 }
 
-public class RoundsGameCommand : BaseCommand<RoundsGameSettings>
+public class RounderGameCommand : BaseCommand<RounderGameSettings>
 {
-    protected override (Game, Table) InitializeGame(RoundsGameSettings settings)
+
+    protected override (Game, Table) InitializeGame(RounderGameSettings settings)
     {
         settings.Rounds ??= GetRounds();
         AnsiConsole.MarkupLine($"Starting [green]Rounds darts to {settings.Rounds}[/] with [green]{settings.Players!.Length}[/] players");
-        var game = new RoundsGame(settings.Players, settings.Rounds.Value);
+        var game = new RounderGame(settings.Rounds.Value,settings.Players);
         DartBoard.Initialize(game, settings.Players);
         return (game, DartBoard.Table);
     }
-
-    private static int GetRounds() => AnsiConsole.Prompt(new TextPrompt<int>("How many rounds?"));
+    private static int GetRounds()
+        => AnsiConsole.Ask<int>("How many rounds?");
 }

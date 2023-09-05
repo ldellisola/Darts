@@ -51,5 +51,6 @@ public static class DartBoard
 
     private static void UpdateTableCell(int row, int column, string? value) => Table.UpdateCell(row, column + 1, $"[reverse]{value ?? "  "}[/]");
 
-    private static void UpdateScore(int column, int score) => Table.UpdateCell(Table.Rows.Count - 1, column + 1, $"[bold]{score}[/]");
+    private static void UpdateScore(int column, int score)
+        => Table.UpdateCell(Table.Rows.Count - 1, column + 1, $"[bold]{score}[/]");
 }
