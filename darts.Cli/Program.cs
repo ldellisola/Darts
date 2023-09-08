@@ -11,8 +11,9 @@ app.Configure(config =>
     config.AddCommand<NewGameCommand>("new");
     config.AddCommand<ClassicGameCommand>("classic");
     config.AddCommand<KnockoutGameCommand>("knockout");
-    config.AddCommand<TotalerGameCommand>("totaler");
-    config.AddCommand<RounderGameCommand>("rounder");
+    config.AddCommand<HighScoreGameCommand>("high-score");
+    config.AddCommand<BestOfGameCommand>("best-of");
+    config.AddCommand<UnlimitedGameCommand>("unlimited");
 });
 
 app.Run(args);

@@ -132,9 +132,11 @@ public abstract class Game
 
     protected abstract int GetPlayerScore(int player);
 
-    protected void ExecuteOnTotalScoreChanged(int player)
+    protected int ExecuteOnTotalScoreChanged(int player)
     {
-        OnTotalScoreChanged?.Invoke(player, GetPlayerScore(player));
+        var playerScore = GetPlayerScore(player);
+        OnTotalScoreChanged?.Invoke(player, playerScore);
+        return playerScore;
     }
 
     public string ToJson()

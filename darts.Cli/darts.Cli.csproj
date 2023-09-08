@@ -12,6 +12,10 @@
     <PropertyGroup>
         <AnalysisMode>Recommended</AnalysisMode>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>$(NoWarn);CS1591;CS1573;CS8765</NoWarn>
+<!--        <GenerateDocumentationFile>true</GenerateDocumentationFile>-->
+
     </PropertyGroup>
 
 
@@ -28,15 +32,5 @@
     <PackageReference Include="Spectre.Console.Cli" Version="0.47.0" />
     <PackageReference Include="Spectre.Console.Json" Version="0.47.0" />
   </ItemGroup>
-
-  <ItemGroup>
-      <EditorConfigFiles Include="..\.globalconfig" />
-    <Content Include="..\.editorconfig">
-      <Link>.editorConfig</Link>
-    </Content>
-    <Content Include="..\.globalconfig">
-      <Link>.globalConfig</Link>
-    </Content>
-  </ItemGroup>
-
+    
 </Project>

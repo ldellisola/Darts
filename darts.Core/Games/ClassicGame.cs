@@ -1,3 +1,4 @@
+
 namespace Darts.Core.Games;
 
 public class ClassicGame : Game
@@ -48,4 +49,12 @@ public class ClassicGame : Game
         }
     }
 
+    public string GetPlayerName(int player) => Score.Players[player];
+    public List<List<(int Score, int Multiplier)>> GetPossibleThrows(int tuplePlayer, string? rawScore)
+    {
+        var goal = maxScore;
+        var currentScore = maxScore - GetPlayerScore(tuplePlayer);
+        var shotNumber = Math.Max(0, rawScore?.Split('+').Length ?? 0);
+        return DartsCombinations.FindCombinations(currentScore, goal, shotNumber, 10);
+    }
 }

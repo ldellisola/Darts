@@ -1,6 +1,6 @@
 namespace Darts.Core.Games;
 
-public class TotalerGame : Game
+public class HighScoreGame : Game
 {
     private readonly int _rounds;
     protected override int GetPlayerScore(int player)
@@ -17,7 +17,7 @@ public class TotalerGame : Game
                {"Rounds", _rounds}
            };
 
-    public TotalerGame(string[] players, int rounds) : base(new DartScore(players))
+    public HighScoreGame(string[] players, int rounds) : base(new DartScore(players))
     {
         _rounds = rounds;
         OnScoreChanged += (cell) => ExecuteOnTotalScoreChanged(cell.player);

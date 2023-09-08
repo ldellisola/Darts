@@ -6,7 +6,7 @@ namespace darts.Cli.Infrastructure;
 /// <summary>
 /// Dependency injection registrar.
 /// </summary>
-internal class TypeRegistrar : ITypeRegistrar
+internal sealed class TypeRegistrar : ITypeRegistrar
 {
     private readonly IServiceCollection builder;
 

@@ -127,7 +127,7 @@ public class DartScore
     public bool TryGetPlayerScore(int player, out int score)
     {
         var exp = new StringBuilder()
-            .AppendJoin('+', _scores[player].Select(s => s ?? "0"))
+            .AppendJoin('+', _scores[player].Select(s => string.IsNullOrWhiteSpace(s) ? "0" : s.Trim('+')))
             .ToString();
 
         if (SimpleMathInterpreter.TryResolve(exp, out int result))

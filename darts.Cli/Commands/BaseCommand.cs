@@ -9,13 +9,21 @@ public abstract class BaseCommand<T> : Command<T> where T : NewGameSettings
     {
         settings.Players ??= GetPlayers();
 
-        var (game, table) = InitializeGame(settings);
-        game.Start();
-        AnsiConsole.Live(table)
-                   .Start(ct =>
-                                      {
-                                          ct.Refresh();
+        var (game, table, panel) = InitializeGame(settings);
 
+        var layout = new Layout("Root")
+            .SplitColumns(
+                new Layout("GameBoard", table).Ratio(3),
+                new Layout("PlayerStats", Align.Left((panel ?? new("")).Expand()))
+            );
+
+        if (panel is null)
+            layout["PlayerStats"].Invisible();
+
+        game.Start();
+        AnsiConsole.Live(layout)
+                   .Start(ct =>
+                   {
                                           while(true)
                                           {
                                               ct.Refresh();
@@ -27,8 +35,8 @@ public abstract class BaseCommand<T> : Command<T> where T : NewGameSettings
 
                                               game.Consume(ch);
                                           }
-                                      });
 
+                   });
         File.WriteAllText(Path.Combine(Environment.CurrentDirectory, $"game_{DateTime.Now:yy-MM-dd-hh-mm-ss}.json"), game.ToJson());
 
        // AnsiConsole.Write(
@@ -40,7 +48,7 @@ public abstract class BaseCommand<T> : Command<T> where T : NewGameSettings
         return 0;
     }
 
-    protected abstract (Game, Table) InitializeGame(T settings);
+    protected abstract (Game, Table, Panel?) InitializeGame(T settings);
 
     private static string[] GetPlayers()
     {

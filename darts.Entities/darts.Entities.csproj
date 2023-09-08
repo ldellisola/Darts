@@ -6,15 +6,4 @@
     <Nullable>enable</Nullable>
     <RootNamespace>Darts.Entities</RootNamespace>
   </PropertyGroup>
-
-    <ItemGroup>
-        <EditorConfigFiles Include="..\.globalconfig" />
-        <Content Include="..\.editorconfig">
-            <Link>.editorConfig</Link>
-        </Content>
-        <Content Include="..\.globalconfig">
-            <Link>.globalConfig</Link>
-        </Content>
-    </ItemGroup>
-
 </Project>

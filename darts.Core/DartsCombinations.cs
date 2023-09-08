@@ -1,20 +1,20 @@
 namespace Darts.Core;
 
-public class DartsCombinations
+public static class DartsCombinations
 {
     private static readonly int[] Scores = { 25, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 };
     private static readonly int[] Multipliers = { 1, 2, 3 };
     private static readonly int BullseyeScore = 50;
     private const int MaxShots = 3;
 
-    public List<List<(int Score, int Multiplier)>> FindCombinations(int currentScore, int goal, int shotNumber, int maxCombinations)
+    public static List<List<(int Score, int Multiplier)>> FindCombinations(int currentScore, int goal, int shotNumber, int maxCombinations)
     {
         var combinations = new List<List<(int, int)>>();
         FindCombinationsRecursive(goal - currentScore, new List<(int, int)>(), combinations, shotNumber, maxCombinations, 0);
         return combinations;
     }
 
-    private void FindCombinationsRecursive(int target, List<(int Score, int Multiplier)> currentCombination, List<List<(int, int)>> combinations, int shotNumber, int maxCombinations, int scoreStartIndex)
+    private static void FindCombinationsRecursive(int target, List<(int Score, int Multiplier)> currentCombination, List<List<(int, int)>> combinations, int shotNumber, int maxCombinations, int scoreStartIndex)
     {
         if (combinations.Count >= maxCombinations) return;
 

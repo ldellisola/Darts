@@ -21,7 +21,9 @@ public class NewGameCommand : Command<NewGameSettings>
         {
             "classic" => new ClassicGameCommand().Execute(context, new ClassicGameSettings { Players = settings.Players }),
             "knockout" => new KnockoutGameCommand().Execute(context, new KnockoutGameSettings { Players = settings.Players }),
-            "totaler" => new TotalerGameCommand().Execute(context, new TotalerGameSettings { Players = settings.Players }),
+            "highscore" => new HighScoreGameCommand().Execute(context, new HighScoreGameSettings { Players = settings.Players }),
+            "best-of" => new BestOfGameCommand().Execute(context,new BestOfGameSettings {Players = settings.Players }),
+            "unlimited" => new UnlimitedGameCommand().Execute(context, new NewGameSettings { Players = settings.Players }),
             _ => throw new NotSupportedException($"Game {gameName} is not supported")
         };
     }

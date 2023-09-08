@@ -2,7 +2,7 @@ using Spectre.Console.Cli;
 
 namespace darts.Cli.Infrastructure;
 
-internal class TypeResolver : ITypeResolver
+internal sealed class TypeResolver : ITypeResolver
 {
 
 	private readonly IServiceProvider _provider;

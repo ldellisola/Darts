@@ -35,7 +35,7 @@ public static class DartBoard
             _ = Table.AddColumn(player);
         }
         game.OnTotalScoreChanged += UpdateScore;
-        _ = Table.AddRow(players.Select(_ => new Markup("   ")).Prepend(new Markup("[bold]Score[/]")));
+        _ = Table.AddRow(players.Select(_ => new Markup("   ")).Prepend(new Markup("[bold]Total Score[/]")));
     }
 
     private static void MarkPlayerAsWinner(int column) => Table.UpdateCell(Table.Rows.Count - 1, column + 1, $"[bold][green]WINNER[/][/]");

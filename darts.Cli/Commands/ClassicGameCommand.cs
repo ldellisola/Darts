@@ -13,16 +13,16 @@ public class ClassicGameSettings : NewGameSettings
 
 public class ClassicGameCommand : BaseCommand<ClassicGameSettings>
 {
-    protected override (Game, Table) InitializeGame(ClassicGameSettings settings)
+    protected override (Game, Table, Panel?) InitializeGame(ClassicGameSettings settings)
     {
         settings.Score ??= GetScore();
 
         AnsiConsole.MarkupLine($"Starting [green]Classic darts to {settings.Score}[/] with [green]{settings.Players!.Length}[/] players");
         var game = new ClassicGame(settings.Players, settings.Score.Value);
         DartBoard.Initialize(game, settings.Players);
-        return (game, DartBoard.Table);
+        PlayerStats.Initialize(game);
+        return (game, DartBoard.Table,PlayerStats.Panel);
     }
 
-    private static int GetScore()
-        => AnsiConsole.Prompt(new TextPrompt<int>("What is the score to play to?"));
+    private static int GetScore() => AnsiConsole.Prompt(new TextPrompt<int>("What is the score to play to?"));
 }

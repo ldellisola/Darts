@@ -1,10 +1,10 @@
 namespace Darts.Core.Games;
 
-public class RounderGame : Game
+public class BestOfGame : Game
 {
     private readonly int _rounds;
 
-    public RounderGame(int rounds, string[] players) : base(new DartScore(players))
+    public BestOfGame(int rounds, string[] players) : base(new DartScore(players))
     {
         _rounds = rounds;
         OnScoreChanged += _ => UpdateAllPlayerScores();
@@ -32,9 +32,33 @@ public class RounderGame : Game
 
     private void UpdateAllPlayerScores()
     {
-        for (var player = 0; player < Score.Players.Length; player++)
+        var roundsWon = Score.Players.Select((_, i) => ExecuteOnTotalScoreChanged(i)).WithIndex().ToArray();
+        var maxWins = (_rounds / 2) + 1;
+
+        foreach (var (i, score) in roundsWon)
         {
-            ExecuteOnTotalScoreChanged(player);
+            if (score >= maxWins)
+            {
+                Winner = i;
+                break;
+            }
+
+            var remaining = _rounds - roundsWon.Sum(t=> t.Value);
+            var canAnyPlayerSurpass = false;
+            for (var j = 0; j < roundsWon.Length; j++)
+            {
+                if (i != j && roundsWon[j].Value + remaining > roundsWon[i].Value)
+                {
+                    canAnyPlayerSurpass = true;
+                    break;
+                }
+            }
+
+            if (!canAnyPlayerSurpass)
+            {
+                Winner = i;
+                // break;
+            }
         }
     }
 

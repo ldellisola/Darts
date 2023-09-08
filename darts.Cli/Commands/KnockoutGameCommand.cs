@@ -13,14 +13,14 @@ public class KnockoutGameSettings : NewGameSettings
 
 public class KnockoutGameCommand : BaseCommand<KnockoutGameSettings>
 {
-    protected override (Game, Table) InitializeGame(KnockoutGameSettings settings)
+    protected override (Game, Table, Panel?) InitializeGame(KnockoutGameSettings settings)
     {
         settings.DropLast ??= GetDropLast();
         AnsiConsole.MarkupLine($"Starting [green]Knockout darts with {settings.DropLast} drop last[/] with [green]{settings.Players!.Length}[/] players");
 
         var game = new KnockoutGame(settings.Players, settings.DropLast.Value);
         DartBoard.Initialize(game, settings.Players);
-        return (game, DartBoard.Table);
+        return (game, DartBoard.Table, null);
     }
 
     private static int GetDropLast()

@@ -10,17 +10,4 @@
   <ItemGroup>
     <ProjectReference Include="..\Darts.Entities\Darts.Entities.csproj" />
   </ItemGroup>
-
-    <ItemGroup>
-        <EditorConfigFiles Include="..\.globalconfig" />
-        <Content Include="..\.editorconfig">
-            <Link>.editorConfig</Link>
-        </Content>
-        <Content Include="..\.globalconfig">
-            <Link>.globalConfig</Link>
-        </Content>
-    </ItemGroup>
-
-
-
 </Project>
