@@ -61,10 +61,10 @@ public class DartScore
     public ScoreCell NextPlayer()
     {
         currentPlayer++;
-        if (currentPlayer >= _playersCount)
-        {
-            currentPlayer = 0;
-        }
+                if (currentPlayer >= _playersCount)
+                {
+                    currentPlayer = 0;
+                }
         return new(currentRound, currentPlayer, _scores[currentPlayer][currentRound]);
     }
 

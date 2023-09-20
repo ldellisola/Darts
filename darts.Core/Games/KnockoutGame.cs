@@ -17,6 +17,14 @@ public class KnockoutGame : Game
 
     public bool IsPlayerEliminated(int player) => _playerStatus[player];
 
+
+    protected override int ExecuteOnTotalScoreChanged(int player)
+    {
+        // var playerScore = GetPlayerScore(player);
+        // OnTotalScoreChanged?.Invoke(player, playerScore);
+        return 0;
+    }
+
     private void RefreshEliminatedPlayers(int totalRounds, int playersLength)
     {
         _playerStatus = new bool[playersLength];

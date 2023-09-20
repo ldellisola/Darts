@@ -7,6 +7,7 @@ public abstract class Game
 {
     public DartScore Score { get; }
 
+    public List<string> Players => Score.Players.ToList();
     protected int Winner
     {
         set => OnPlayerWon?.Invoke(value);
@@ -39,57 +40,7 @@ public abstract class Game
         }
     }
 
-    public virtual void Consume(ConsoleKeyInfo keyInfo)
-    {
-        switch(keyInfo)
-        {
-            case { Key: ConsoleKey.LeftArrow }:
-            {
-                GoToPreviousPlayer();
-                break;
-            }
-            case { Key: ConsoleKey.RightArrow }:
-            {
-                GoToNextPlayer();
-                break;
-            }
-            case { Key: ConsoleKey.UpArrow }:
-            {
-                GoToPreviousRound();
-                break;
-            }
-            case { Key: ConsoleKey.DownArrow }:
-            {
-                GoToNextRound();
-                break;
-            }
-            case { Key: ConsoleKey.Spacebar }:
-            {
-                OnScoreChanged?.Invoke(Score.CurrentRaw);
-                break;
-            }
-            case { Key: ConsoleKey.Enter }:
-            {
-                CreateNewRound();
-                break;
-            }
-            case { KeyChar: '+' or '*' }:
-            case { KeyChar: >= '0' and <= '9' }:
-            {
-                Score.UpdatePartialScore(keyInfo.KeyChar);
-                OnScoreChanged?.Invoke(Score.CurrentRaw);
-                break;
-            }
-            case { Key: ConsoleKey.Backspace }:
-            {
-                Score.DeleteScore();
-                OnScoreChanged?.Invoke(Score.CurrentRaw);
-                break;
-            }
-        }
-    }
-
-    protected virtual void CreateNewRound()
+    public virtual void CreateNewRound()
     {
         if(Score.Players.WithIndex().Aggregate(true, (b, tuple) => b && !Score.TryGetPlayerScore(tuple.Index, Score.TotalRounds - 1, out _)))
         {
@@ -102,28 +53,28 @@ public abstract class Game
         OnScoreSelected?.Invoke(Score.CurrentComputed);
     }
 
-    protected virtual void GoToNextRound()
+    public virtual void GoToNextRound()
     {
         OnScoreDeselected?.Invoke(Score.CurrentComputed);
         Score.NextRound();
         OnScoreSelected?.Invoke(Score.CurrentComputed);
     }
 
-    protected virtual void GoToPreviousRound()
+    public virtual void GoToPreviousRound()
     {
         OnScoreDeselected?.Invoke(Score.CurrentComputed);
         Score.PreviousRound();
         OnScoreSelected?.Invoke(Score.CurrentComputed);
     }
 
-    protected virtual void GoToNextPlayer()
+    public virtual void GoToNextPlayer()
     {
         OnScoreDeselected?.Invoke(Score.CurrentComputed);
         Score.NextPlayer();
         OnScoreSelected?.Invoke(Score.CurrentComputed);
     }
 
-    protected virtual void GoToPreviousPlayer()
+    public virtual void GoToPreviousPlayer()
     {
         OnScoreDeselected?.Invoke(Score.CurrentComputed);
         Score.PreviousPlayer();
@@ -132,7 +83,7 @@ public abstract class Game
 
     protected abstract int GetPlayerScore(int player);
 
-    protected int ExecuteOnTotalScoreChanged(int player)
+    protected virtual int ExecuteOnTotalScoreChanged(int player)
     {
         var playerScore = GetPlayerScore(player);
         OnTotalScoreChanged?.Invoke(player, playerScore);
@@ -159,4 +110,16 @@ public abstract class Game
     }
 
     protected abstract Dictionary<string, object?> GetGameState();
+
+    public virtual void UpdatePartialScore(char ch)
+    {
+        Score.UpdatePartialScore(ch);
+        OnScoreChanged?.Invoke(Score.CurrentRaw);
+    }
+
+    public virtual void DeleteScore()
+    {
+        Score.DeleteScore();
+        OnScoreChanged?.Invoke(Score.CurrentRaw);
+    }
 }
