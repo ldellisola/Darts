@@ -41,7 +41,7 @@ public class ClassicGame : Game
         return false;
     }
 
-    protected override void CreateNewRound()
+    public override void CreateNewRound()
     {
         if (CheckWinner() is false)
         {

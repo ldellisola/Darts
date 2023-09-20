@@ -23,7 +23,7 @@ public class HighScoreGame : Game
         OnScoreChanged += (cell) => ExecuteOnTotalScoreChanged(cell.player);
     }
 
-    protected override void CreateNewRound()
+    public override void CreateNewRound()
     {
         if (Score.TotalRounds < _rounds)
         {

@@ -62,7 +62,7 @@ public class BestOfGame : Game
         }
     }
 
-    protected override void CreateNewRound()
+    public override void CreateNewRound()
     {
         if (Score.TotalRounds < _rounds)
         {

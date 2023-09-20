@@ -2,8 +2,6 @@ namespace Darts.Core.Expression;
 
 public class SimpleMathInterpreter
 {
-
-
     public static bool TryResolve(string expression, out int result)
     {
         var (success, value) = Resolve(expression);

@@ -1,6 +1,5 @@
 using System.Text;
 using Darts.Core.Expression;
-using Darts.Entities;
 
 namespace Darts.Core;
 
@@ -15,38 +14,47 @@ public class DartScore2
         _scores = new(Enumerable.Range(0,players).Select(_ => new List<string?>()));
     }
 
-    /// <summary>
-    /// Adds a new row to the table
-    /// </summary>
-    /// <returns>The total amount of rounds </returns>
-    public int NewRound()
+    public void NewRound()
     {
         foreach (var playerScore in _scores)
             playerScore.Add(null);
         Rounds++;
-        return Rounds;
     }
 
-    /// <summary>
-    /// Updates the score of the current player in the current round
-    /// </summary>
-    /// <param name="score">Value to add</param>
-    /// <returns>Player/round modified with the new value</returns>
-    public ScoreCell UpdatePartialScore(char score)
+    public void DeleteScore(int player, int round)
     {
-        i
+        if (_scores[player][round] is not null && _scores[player][round]!.Length > 0)
+            _scores[player][round] = _scores[player][round]?[..^1];
     }
 
 
-    /// <summary>
-    /// Delete the score of a player
-    /// </summary>
-    /// <returns>Player/round modified with the current value</returns>
-    public ScoreCell DeleteScore()
+    public bool TryGetRawScore(int player, int round, out string? score)
     {
-        if (_scores[currentPlayer][currentRound] is not null && _scores[currentPlayer][currentRound]!.Length > 0)
-            _scores[currentPlayer][currentRound] = _scores[currentPlayer][currentRound]?[..^1];
-        return new(currentRound, currentPlayer, _scores[currentPlayer][currentRound]);
+        score = null;
+        if (player >= _playersCount  || player < 0 || round >= Rounds || round < 0)
+            return false;
+
+        if (_scores[player][round] is null)
+            return false;
+
+        score = _scores[player][round]!;
+        return true;
+    }
+
+    public bool TryGetComputedScore(int player, int round, out string? score)
+    {
+        score = null;
+        if (player >= _playersCount  || player < 0 || round >= Rounds || round < 0)
+            return false;
+
+        if (_scores[player][round] is null)
+            return false;
+
+        if (!SimpleMathInterpreter.TryResolve(_scores[player][round]!, out var result))
+            return false;
+
+        score = result.ToString();
+        return true;
     }
 
 
@@ -65,43 +73,9 @@ public class DartScore2
         return false;
     }
 
-    public bool TryGetPlayerScore(int player, int round, out int score)
-    {
-        if (_scores[player][round] is null)
-        {
-            score = -1;
-            return false;
-        }
-
-        if (SimpleMathInterpreter.TryResolve(_scores[player][round]!, out score))
-        {
-            return true;
-        }
-        score = -1;
-        return false;
-    }
-
-    public int[][] GetScores()
-    {
-        var scores = new int[_playersCount][];
-        for (var i = 0; i < _playersCount; i++)
-        {
-            scores[i] = new int[Rounds];
-            for (var j = 0; j < Rounds; j++)
-            {
-                if (TryGetPlayerScore(i, j, out var score))
-                {
-                    scores[i][j] = score;
-                }
-            }
-        }
-
-        return scores;
-    }
-
     public void UpdatePartialScore(int player, int round, char c)
     {
-        _scores[player][round] ??= "";
+        _scores[player][round] ??= string.Empty;
         _scores[player][round] += c;
     }
 }

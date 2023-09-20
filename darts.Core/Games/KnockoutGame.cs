@@ -60,16 +60,16 @@ public class KnockoutGame : Game
             Winner = _playerStatus.ToList().IndexOf(false);
     }
 
-    public override void Consume(ConsoleKeyInfo keyInfo)
-    {
-        base.Consume(keyInfo);
-        if (keyInfo.Key == ConsoleKey.Enter)
-        {
-            RefreshEliminatedPlayers(Score.TotalRounds, Score.Players.Length);
-        }
-    }
+    // public void Consume(ConsoleKeyInfo keyInfo)
+    // {
+    //     base.Consume(keyInfo);
+    //     if (keyInfo.Key == ConsoleKey.Enter)
+    //     {
+    //         RefreshEliminatedPlayers(Score.TotalRounds, Score.Players.Length);
+    //     }
+    // }
 
-    protected override void GoToNextPlayer()
+    public override void GoToNextPlayer()
     {
         do
         {
@@ -78,7 +78,7 @@ public class KnockoutGame : Game
         while (IsPlayerEliminated(Score.CurrentRaw.player) && Score.CurrentRaw.value is null);
     }
 
-    protected override void GoToPreviousPlayer()
+    public override void GoToPreviousPlayer()
     {
         do
         {
@@ -88,7 +88,7 @@ public class KnockoutGame : Game
     }
 
 
-    protected override void GoToNextRound()
+    public override void GoToNextRound()
     {
         base.GoToNextRound();
         if (IsPlayerEliminated(Score.CurrentRaw.player) && Score.CurrentRaw.value is null)

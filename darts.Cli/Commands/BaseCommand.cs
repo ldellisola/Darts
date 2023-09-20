@@ -33,7 +33,7 @@ public abstract class BaseCommand<T> : Command<T> where T : NewGameSettings
                                                   break;
                                               }
 
-                                              game.Consume(ch);
+                                              // game.Consume(ch);
                                           }
 
                    });
