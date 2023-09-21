@@ -1,60 +1,43 @@
+using Darts.Entities;
 
 namespace Darts.Core.Games;
 
-public class ClassicGame : Game
+public class ClassicGame : DartsGame
 {
-    private readonly int maxScore;
+    public int Goal { get; }
 
-    public ClassicGame(string[] players, int maxScore) : base(new DartScore(players))
+
+    private void CheckWinner()
     {
-        this.maxScore = maxScore;
-        OnScoreChanged += (cell) => ExecuteOnTotalScoreChanged(cell.player);
-    }
-
-    protected override int GetPlayerScore(int player)
-    {
-        if(Score.TryGetPlayerScore(player, out var score))
-            return maxScore - score;
-        return maxScore;
-    }
-
-    protected override Dictionary<string, object?> GetGameState()
-        => new()
-           {
-               {"MaxScore", maxScore}
-           } ;
-
-    private bool CheckWinner()
-    {
-        var winners = Score.Players
+        Winner = Players
             .WithIndex()
-            .Where(player => Score.TryGetPlayerScore(player.Index, out var score) && score == maxScore)
-            .Select(t=> t.Index)
-            .ToArray();
-
-        if (winners.Any())
-        {
-            Winner = winners.First();
-            return true;
-        }
-
-        return false;
+            .Where(player => Score.TryGetPlayerScore(player.Index, out var score) && score == Goal)
+            .Select(t => t.Index)
+            .FirstOrDefault();
     }
-
-    public override void CreateNewRound()
+    public ClassicGame(IReadOnlyCollection<string> players, int goal) : base(players)
     {
-        if (CheckWinner() is false)
-        {
-            base.CreateNewRound();
-        }
+        Goal = goal;
     }
 
-    public string GetPlayerName(int player) => Score.Players[player];
-    public List<List<(int Score, int Multiplier)>> GetPossibleThrows(int tuplePlayer, string? rawScore)
+    public override bool Consume(ConsoleKey key)
     {
-        var goal = maxScore;
-        var currentScore = maxScore - GetPlayerScore(tuplePlayer);
-        var shotNumber = Math.Max(0, rawScore?.Split('+').Length ?? 0);
-        return DartsCombinations.FindCombinations(currentScore, goal, shotNumber, 10);
+        var result = base.Consume(key);
+        CheckWinner();
+        return result;
     }
+
+    public bool TryGetPossibleThrows(int player, int round, out List<DartsThrow> throws)
+    {
+        throws = new();
+        if (player >= Players.Count || player < 0 || round >= Score.Rounds || round < 0)
+            return false;
+
+        var shotNumber = Score.TryGetRawScore(player, round, out var score) ? score?.Split('+').Length-1 : 0;
+        var currentScore = Score.TryGetPlayerScore(player, out var playerScore) ? playerScore : 0;
+        throws = DartsCombinations.FindCombinations(currentScore,Goal, shotNumber ?? 0, 15);
+        return throws.Count > 0;
+    }
+
+    public int GetPlayerScore(int player) => Goal - (Score.TryGetPlayerScore(player, out var score) ? score : 0);
 }

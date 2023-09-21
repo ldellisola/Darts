@@ -6,7 +6,7 @@ namespace Darts.Core;
 public class DartScore2
 {
     private readonly List<List<string?>> _scores;
-    private readonly int _playersCount;
+    private int _playersCount;
     public int Rounds { get; private set; }
     public DartScore2(int players)
     {
@@ -77,5 +77,10 @@ public class DartScore2
     {
         _scores[player][round] ??= string.Empty;
         _scores[player][round] += c;
+    }
+    public void AddPlayer()
+    {
+        _playersCount++;
+        _scores.Add(Enumerable.Range(0,Rounds).Select(_ => (string?)null).ToList());
     }
 }

@@ -3,13 +3,13 @@ using Spectre.Console.Cli;
 
 namespace Darts.Cli.Commands;
 
-public abstract class NewBaseCommand<T> : Command<T> where T : NewGameSettings
+public abstract class NewBaseCommand<TSettings,TGame> : Command<TSettings> where TSettings : NewGameSettings  where TGame : DartsGame
 {
-    protected Layout Layout { get; } = new("root");
-    protected DartsGame Game { get; private set; } = null!;
+    protected Layout Layout { get; set; } = new("root");
+    protected TGame Game { get; private set; } = null!;
     protected bool ShowRawScore { get; private set; }
 
-    public override int Execute(CommandContext context, T settings)
+    public override int Execute(CommandContext context, TSettings settings)
     {
         settings.Players ??= GetPlayers();
         Game = InitializeGame(settings);
@@ -38,8 +38,7 @@ public abstract class NewBaseCommand<T> : Command<T> where T : NewGameSettings
         return Game.Consume(ch.Key);
     }
 
-    protected abstract DartsGame
-        InitializeGame(T settings);
+    protected abstract TGame InitializeGame(TSettings settings);
 
     protected abstract void DrawGame();
 

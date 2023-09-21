@@ -1,3 +1,5 @@
+using Darts.Entities;
+
 namespace Darts.Core;
 
 public static class DartsCombinations
@@ -7,11 +9,11 @@ public static class DartsCombinations
     private static readonly int BullseyeScore = 50;
     private const int MaxShots = 3;
 
-    public static List<List<(int Score, int Multiplier)>> FindCombinations(int currentScore, int goal, int shotNumber, int maxCombinations)
+    public static List<DartsThrow> FindCombinations(int currentScore, int goal, int shotNumber, int maxCombinations)
     {
         var combinations = new List<List<(int, int)>>();
         FindCombinationsRecursive(goal - currentScore, new List<(int, int)>(), combinations, shotNumber, maxCombinations, 0);
-        return combinations;
+        return combinations.Select(t=> new DartsThrow(t)).ToList();
     }
 
     private static void FindCombinationsRecursive(int target, List<(int Score, int Multiplier)> currentCombination, List<List<(int, int)>> combinations, int shotNumber, int maxCombinations, int scoreStartIndex)
