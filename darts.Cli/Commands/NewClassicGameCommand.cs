@@ -12,10 +12,22 @@ public class NewClassicGameCommand : NewBaseCommand<ClassicGameSettings>
         if (!isUIInitialized)
         {
             isUIInitialized = true;
-            table = Game.Players.Aggregate(new Table().AddColumn("Round"), (t, player) => t.AddColumn(player));
-            table.AddRow(Enumerable.Repeat(new Markup(""), Game.Players.Count).Prepend(new Markup("[bold]Total Score[/]")));
+            table = Game.Players.Aggregate(
+                                           new Table().AddColumn("Round", t=> t.Footer("[bold]Total Score[/]")),
+                                           (t, player) => t.AddColumn(player, c => c.Footer("0"))
+                                           );
             Layout.SplitColumns(new Layout("game", new Panel(table).Header("Classic")));
             table.ShowFooters();
+        }
+
+        for(var p = 0; p < Game.Players.Count; p++)
+        {
+            if (p >= table.Columns.Count)
+                table.AddColumn(Game.Players[p]);
+            else if (p < table.Columns.Count)
+                table.Columns[p].Header = new Text(Game.Players[p]);
+
+            table.Columns[p].Footer = new Markup(Game.Score.TryGetPlayerScore(p, out var score) ? score.ToString() : "0");
         }
 
         while (table.Rows.Count - 1 < Game.TotalRounds)
