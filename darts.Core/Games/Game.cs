@@ -132,7 +132,7 @@ public abstract class Game
 
     protected abstract int GetPlayerScore(int player);
 
-    protected int ExecuteOnTotalScoreChanged(int player)
+    protected virtual int ExecuteOnTotalScoreChanged(int player)
     {
         var playerScore = GetPlayerScore(player);
         OnTotalScoreChanged?.Invoke(player, playerScore);

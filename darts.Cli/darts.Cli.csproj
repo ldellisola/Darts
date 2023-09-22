@@ -7,6 +7,7 @@
     <Nullable>enable</Nullable>
     <LangVersion>default</LangVersion>
     <RootNamespace>Darts.Cli</RootNamespace>
+    <PublishSingleFile>true</PublishSingleFile>
   </PropertyGroup>
 
     <PropertyGroup>

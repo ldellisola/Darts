@@ -91,7 +91,13 @@ public class KnockoutGame : Game
 
     protected override int GetPlayerScore(int player)
     {
-        throw new NotSupportedException("Knockout game does not support player score");
+        // throw new NotSupportedException("Knockout game does not support player score");
+        return 0;
+    }
+
+    protected override int ExecuteOnTotalScoreChanged(int player)
+    {
+        return 0;
     }
 
     protected override Dictionary<string, object?> GetGameState()

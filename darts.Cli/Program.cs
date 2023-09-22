@@ -1,5 +1,6 @@
 ﻿using Darts.Cli.Commands;
 using darts.Cli.Infrastructure;
+using Spectre.Console;
 using Spectre.Console.Cli;
 
 var registrar = new TypeRegistrar();
@@ -14,6 +15,7 @@ app.Configure(config =>
     config.AddCommand<HighScoreGameCommand>("high-score");
     config.AddCommand<BestOfGameCommand>("best-of");
     config.AddCommand<UnlimitedGameCommand>("unlimited");
+    config.SetExceptionHandler(t => AnsiConsole.WriteException(t));
 });
 
 app.Run(args);
