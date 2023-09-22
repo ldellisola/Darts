@@ -23,7 +23,7 @@ public abstract class NewBaseCommand<TSettings,TGame> : Command<TSettings> where
                                            }
                                            while(GameLoop(Console.ReadKey(true)));
                                        });
-        // File.WriteAllText(Path.Combine(Environment.CurrentDirectory, $"game_{DateTime.Now:yy-MM-dd-hh-mm-ss}.json"), Game.ToJson());
+        File.WriteAllText(Path.Combine(Environment.CurrentDirectory, $"game_{DateTime.Now:yy-MM-dd-hh-mm-ss}.yml"), Game.Export());
         return 0;
     }
 

@@ -11,11 +11,12 @@ public class ClassicGame : DartsGame
     {
         Winner = Players
             .WithIndex()
-            .Where(player => Score.TryGetPlayerScore(player.Index, out var score) && score == Goal)
+            .Where(player => GetPlayerScore(player.Index) is 0)
             .Select(t => t.Index)
+            .Cast<int?>()
             .FirstOrDefault();
     }
-    public ClassicGame(IReadOnlyCollection<string> players, int goal) : base(players)
+    public ClassicGame(IReadOnlyCollection<string> players, int goal, bool isTournament) : base(players, isTournament)
     {
         Goal = goal;
     }

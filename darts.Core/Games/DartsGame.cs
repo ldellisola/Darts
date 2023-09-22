@@ -1,4 +1,7 @@
-﻿using Stateless;
+﻿using System.Text;
+using Stateless;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace Darts.Core.Games;
 
@@ -11,16 +14,23 @@ public enum GameStates
 
 public class DartsGame
 {
+    private readonly bool _isTournament;
+    private readonly ISerializer serializer;
     protected StateMachine<GameStates, ConsoleKey> Machine { get; }
     public int CurrentPlayer { get; private set; }
     public int CurrentRound { get; private set; }
     public int TotalRounds => Score.Rounds;
     public List<string> Players { get; }
-    public DartScore2 Score { get; }
+    public DartScore2 Score { get; private set; }
     public int? Winner { get; protected set; }
 
-    public DartsGame(IReadOnlyCollection<string> players)
+    public DartsGame(IReadOnlyCollection<string> players, bool isTournament)
     {
+        _isTournament = isTournament;
+        serializer = new SerializerBuilder()
+            .WithNamingConvention(CamelCaseNamingConvention.Instance)
+            .Build();
+
         Players = players.ToList();
         Score = new DartScore2(players.Count);
         Score.NewRound();
@@ -127,5 +137,40 @@ public class DartsGame
     {
         if(--CurrentPlayer < 0)
             CurrentPlayer = Players.Count - 1;
+    }
+
+    public string Export()
+    {
+        var obj = new
+        {
+            Players = Players.ToArray(),
+            Score = Score.Export(),
+            Rounds = TotalRounds,
+            Winner = Winner,
+            IsTournament = _isTournament,
+            Date = DateTime.Now
+        };
+
+        return serializer.Serialize(obj);
+    }
+
+    public static DartsGame Import(string yaml)
+    {
+        var deserializer = new DeserializerBuilder()
+            .WithNamingConvention(CamelCaseNamingConvention.Instance)
+            .Build();
+
+        var obj = deserializer.Deserialize<dynamic>(yaml);
+        var players = ((IEnumerable<string>)obj.Players).Select(p => p).ToList();
+        var rounds = (int)obj.Rounds;
+        var winner = (int?)obj.Winner;
+        var isTournament = (bool)obj.IsTournament;
+
+        return new DartsGame(players, isTournament)
+        {
+            Score = DartScore2.Import((string)obj.Score, players.Count, rounds),
+            Winner = winner
+        };
+
     }
 }

@@ -17,7 +17,7 @@ public class ClassicGameCommand : NewBaseCommand<ClassicGameSettings, ClassicGam
     private Table scoreTable = null!;
     private readonly Table statsTable = new();
     private bool isUIInitialized;
-    protected override ClassicGame InitializeGame(ClassicGameSettings settings) => new (settings.Players!, settings.Score!.Value);
+    protected override ClassicGame InitializeGame(ClassicGameSettings settings) => new (settings.Players!, settings.Score!.Value,settings.IsTournament);
     protected override void DrawGame()
     {
         if (!isUIInitialized)
@@ -48,13 +48,6 @@ public class ClassicGameCommand : NewBaseCommand<ClassicGameSettings, ClassicGam
             _ = dartsThrows.Aggregate(statsTable, (t, possibleThrow) => t.AddRow(possibleThrow.ToString()));
         }
 
-
-        for(var p = 0; p < Game.Players.Count; p++)
-        {
-            scoreTable.Columns[1+p].Header = new Text(Game.Players[p]);
-            scoreTable.Columns[1+p].Footer = new Markup(Game.GetPlayerScore(p).ToString(CultureInfo.InvariantCulture));
-        }
-
         while (scoreTable.Rows.Count < Game.TotalRounds)
             scoreTable.AddRow(Enumerable.Repeat(new Markup(""), Game.Players.Count));
 
@@ -78,6 +71,12 @@ public class ClassicGameCommand : NewBaseCommand<ClassicGameSettings, ClassicGam
                     scoreTable.UpdateCell(r, p + 1, Game.Score.TryGetComputedScore(p, r, out var score) ? score ?? "   " : "  ");
                 }
             }
+
+            scoreTable.Columns[1+p].Header = new Text(Game.Players[p]);
+            if (Game.Winner is not null && Game.Winner.Value == p)
+                scoreTable.Columns[1 + Game.Winner.Value].Footer = new Markup("[bold][green]WINNER[/][/]");
+            else
+                scoreTable.Columns[1+p].Footer = new Markup(Game.GetPlayerScore(p).ToString(CultureInfo.InvariantCulture));
         }
     }
 }

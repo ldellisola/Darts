@@ -9,6 +9,10 @@ public class NewGameSettings : CommandSettings
     [CommandOption("-p|--players <PLAYERS>")]
     [DefaultValue(null)]
     public string[]? Players { get; set; }
+
+    [CommandOption("-t|--tournament <TYPE>")]
+    [DefaultValue(false)]
+    public bool IsTournament { get; set; }
 }
 public class NewGameCommand : Command<NewGameSettings>
 {
