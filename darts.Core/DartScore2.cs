@@ -84,28 +84,27 @@ public class DartScore2
         _scores.Add(Enumerable.Range(0,Rounds).Select(_ => (string?)null).ToList());
     }
 
-    // export content
-    public string Export()
+    public string[] Export()
     {
-        var sb = new StringBuilder();
-        foreach (var playerScore in _scores)
-        {
-            sb.AppendLine(string.Join(' ', playerScore));
-        }
-        return sb.ToString();
+        return _scores.Select(playerScore =>
+            string.Join(' ', playerScore.WithoutNullTrail().ToArray()
+            )
+        ).ToArray();
     }
 
-    // import content
-    public static DartScore2 Import(string content, int players, int rounds)
+    public static DartScore2 Import(string[] content, int players, int rounds)
     {
-        var lines = content.Split('\n');
-        var score = new DartScore2(players);
+        var score = new DartScore2(players)
+        {
+            Rounds = rounds
+        };
+
         for (var i = 0; i < players; i++)
         {
-            var playerScore = lines[i + 1].Split(' ');
+            var playerScore = content[i].Split(' ');
             for (var j = 0; j < rounds; j++)
             {
-                score._scores[i].Add(playerScore[j]);
+                score._scores[i].Add(j < playerScore.Length ? playerScore[j] : null);
             }
         }
         return score;

@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel;
 using System.Globalization;
+using Darts.Entities.GameState;
 using Spectre.Console;
 using Spectre.Console.Cli;
+using YamlDotNet.Serialization;
 
 namespace Darts.Cli.Commands;
 
@@ -17,7 +19,8 @@ public class ClassicGameCommand : NewBaseCommand<ClassicGameSettings, ClassicGam
     private Table scoreTable = null!;
     private readonly Table statsTable = new();
     private bool isUIInitialized;
-    protected override ClassicGame InitializeGame(ClassicGameSettings settings) => new (settings.Players!, settings.Score!.Value,settings.IsTournament);
+    protected override ClassicGame InitializeGame(ClassicGameSettings settings) => new(settings.Players!, settings.Score!.Value,settings.IsTournament);
+    protected override ClassicGame InitializeGame(GameState state) => new(state);
     protected override void DrawGame()
     {
         if (!isUIInitialized)
@@ -78,5 +81,8 @@ public class ClassicGameCommand : NewBaseCommand<ClassicGameSettings, ClassicGam
             else
                 scoreTable.Columns[1+p].Footer = new Markup(Game.GetPlayerScore(p).ToString(CultureInfo.InvariantCulture));
         }
+    }
+    public ClassicGameCommand(ISerializer serializer) : base(serializer)
+    {
     }
 }

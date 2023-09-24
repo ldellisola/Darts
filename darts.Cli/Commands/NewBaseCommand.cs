@@ -1,13 +1,35 @@
-﻿using Spectre.Console;
+﻿using Darts.Entities.GameState;
+using Spectre.Console;
 using Spectre.Console.Cli;
+using YamlDotNet.Serialization;
 
 namespace Darts.Cli.Commands;
 
-public abstract class NewBaseCommand<TSettings,TGame> : Command<TSettings> where TSettings : NewGameSettings  where TGame : DartsGame
+public abstract class NewBaseCommand<TSettings,TGame> : Command<TSettings> where TSettings : NewGameSettings  where TGame : DartsGame<TGame>
 {
+    public NewBaseCommand(ISerializer serializer) => _serializer = serializer;
+
+    private readonly ISerializer _serializer;
     protected Layout Layout { get; set; } = new("root");
     protected TGame Game { get; private set; } = null!;
     protected bool ShowRawScore { get; private set; }
+
+    public virtual int Execute(GameState state)
+    {
+        Game = InitializeGame(state);
+
+        AnsiConsole.Live(Layout).Start(ct =>
+        {
+            do
+            {
+                DrawGame();
+                ct.Refresh();
+            }
+            while(GameLoop(Console.ReadKey(true)));
+        });
+        File.WriteAllText(Path.Combine(Environment.CurrentDirectory, $"game_{DateTime.Now:yy-MM-dd-hh-mm-ss}.yml"), Export());
+        return 0;
+    }
 
     public override int Execute(CommandContext context, TSettings settings)
     {
@@ -23,7 +45,7 @@ public abstract class NewBaseCommand<TSettings,TGame> : Command<TSettings> where
                                            }
                                            while(GameLoop(Console.ReadKey(true)));
                                        });
-        File.WriteAllText(Path.Combine(Environment.CurrentDirectory, $"game_{DateTime.Now:yy-MM-dd-hh-mm-ss}.yml"), Game.Export());
+        File.WriteAllText(Path.Combine(Environment.CurrentDirectory, $"game_{DateTime.Now:yy-MM-dd-hh-mm-ss}.yml"), Export());
         return 0;
     }
 
@@ -39,6 +61,7 @@ public abstract class NewBaseCommand<TSettings,TGame> : Command<TSettings> where
     }
 
     protected abstract TGame InitializeGame(TSettings settings);
+    protected abstract TGame InitializeGame(GameState state);
 
     protected abstract void DrawGame();
 
@@ -57,5 +80,11 @@ public abstract class NewBaseCommand<TSettings,TGame> : Command<TSettings> where
         }
 
         return players.ToArray();
+    }
+
+    private string Export()
+    {
+        var state = Game.Export();
+        return _serializer.Serialize(state);
     }
 }

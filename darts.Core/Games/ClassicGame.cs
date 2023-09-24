@@ -1,11 +1,27 @@
 using Darts.Entities;
+using Darts.Entities.GameState;
 
 namespace Darts.Core.Games;
 
-public class ClassicGame : DartsGame
+public class ClassicGame : DartsGame<ClassicGame>
 {
     public int Goal { get; }
+    public ClassicGame(IReadOnlyCollection<string> players, int goal, bool isTournament) : base(players, isTournament)
+    {
+        Goal = goal;
+    }
 
+    public ClassicGame(GameState state) : base(state)
+    {
+        Goal = int.Parse(state.GameSpecific["Goal"].ToString()!);
+    }
+
+    public override GameState Export()
+    {
+        var state = base.Export();
+        state.GameSpecific.Add("Goal", Goal);
+        return state;
+    }
 
     private void CheckWinner()
     {
@@ -15,10 +31,6 @@ public class ClassicGame : DartsGame
             .Select(t => t.Index)
             .Cast<int?>()
             .FirstOrDefault();
-    }
-    public ClassicGame(IReadOnlyCollection<string> players, int goal, bool isTournament) : base(players, isTournament)
-    {
-        Goal = goal;
     }
 
     public override bool Consume(ConsoleKey key)

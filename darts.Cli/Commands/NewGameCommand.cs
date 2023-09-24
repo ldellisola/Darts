@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using Spectre.Console;
 using Spectre.Console.Cli;
+using YamlDotNet.Serialization;
 
 namespace Darts.Cli.Commands;
 
@@ -16,6 +17,10 @@ public class NewGameSettings : CommandSettings
 }
 public class NewGameCommand : Command<NewGameSettings>
 {
+    private readonly ISerializer _serializer;
+
+    public NewGameCommand(ISerializer serializer) => _serializer = serializer;
+
     public override int Execute(CommandContext context, NewGameSettings settings)
     {
         var gameName = GetGame();
@@ -23,7 +28,7 @@ public class NewGameCommand : Command<NewGameSettings>
 
         return gameName.ToLowerInvariant() switch
         {
-            "classic" => new ClassicGameCommand().Execute(context, new ClassicGameSettings { Players = settings.Players }),
+            "classic" => new ClassicGameCommand(_serializer).Execute(context, new ClassicGameSettings { Players = settings.Players }),
             "knockout" => new KnockoutGameCommand().Execute(context, new KnockoutGameSettings { Players = settings.Players }),
             "highscore" => new HighScoreGameCommand().Execute(context, new HighScoreGameSettings { Players = settings.Players }),
             "best-of" => new BestOfGameCommand().Execute(context,new BestOfGameSettings {Players = settings.Players }),
