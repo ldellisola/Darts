@@ -31,14 +31,14 @@ public class Common
     public int Rounds { get; set; }
     public int? Winner { get; set; }
 
-    public Common(string[] Players, string[] Scores, int Rounds, int? Winner, bool IsTournament, DateTime Date)
+    public Common(string[] players, string[] scores, int rounds, int? winner, bool isTournament, DateTime date)
     {
-        this.IsTournament = IsTournament;
-        this.Date = Date;
-        this.Players = Players;
-        this.Scores = Scores;
-        this.Rounds = Rounds;
-        this.Winner = Winner;
+        this.IsTournament = isTournament;
+        this.Date = date;
+        this.Players = players;
+        this.Scores = scores;
+        this.Rounds = rounds;
+        this.Winner = winner;
     }
 
     public Common()

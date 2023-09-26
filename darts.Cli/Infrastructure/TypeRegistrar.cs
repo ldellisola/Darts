@@ -8,18 +8,18 @@ namespace darts.Cli.Infrastructure;
 /// </summary>
 internal sealed class TypeRegistrar : ITypeRegistrar
 {
-    private readonly IServiceCollection builder;
+    private readonly IServiceCollection _builder;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TypeRegistrar"/> class.
     /// </summary>
-    public TypeRegistrar() => builder = new ServiceCollection();
+    public TypeRegistrar() => _builder = new ServiceCollection();
 
-    public ITypeResolver Build() => new TypeResolver(builder.BuildServiceProvider());
+    public ITypeResolver Build() => new TypeResolver(_builder.BuildServiceProvider());
 
-    public void Register(Type service, Type implementation) => builder.AddSingleton(service, implementation);
+    public void Register(Type service, Type implementation) => _builder.AddSingleton(service, implementation);
 
-    public void RegisterInstance(Type service, object implementation) => builder.AddSingleton(service, implementation);
+    public void RegisterInstance(Type service, object implementation) => _builder.AddSingleton(service, implementation);
 
     public void RegisterLazy(Type service, Func<object> func)
     {
@@ -28,12 +28,12 @@ internal sealed class TypeRegistrar : ITypeRegistrar
             throw new ArgumentNullException(nameof(func));
         }
 
-        builder.AddSingleton(service, _ => func());
+        _builder.AddSingleton(service, _ => func());
     }
 
     public TypeRegistrar Register(Action<IServiceCollection> action)
     {
-        action(builder);
+        action(_builder);
         return this;
     }
 }

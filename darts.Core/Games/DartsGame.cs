@@ -22,7 +22,7 @@ public abstract class DartsGame<T>
     public DartScore2 Score { get; private set; }
     public int? Winner { get; protected set; }
 
-    private readonly string GameType = typeof(T).Name;
+    private readonly string _gameType = typeof(T).Name;
 
     public DartsGame(IReadOnlyCollection<string> players, bool isTournament)
     : this()
@@ -112,17 +112,36 @@ public abstract class DartsGame<T>
     public virtual bool Consume(ConsoleKey key)
     {
         if (Machine.CanFire(key))
+        {
             Machine.Fire(key);
+            Winner = SelectWinner();
+        }
+
         return Machine.State != States.Finished;
     }
 
-    private void CreateNewRound()
+    protected virtual void CreateNewRound()
     {
         if(Players.WithIndex().Aggregate(true, (b, tuple) => b && !Score.TryGetRawScore(tuple.Index, TotalRounds - 1, out _)))
             return;
         Score.NewRound();
         NextRound();
     }
+
+
+    /// <summary>
+    /// It will return the id of the winner, if there's one
+    /// </summary>
+    /// <returns></returns>
+    protected abstract int? SelectWinner();
+
+    /// <summary>
+    /// It returns the score of a player
+    /// </summary>
+    /// <param name="player">Index of the player</param>
+    /// <returns></returns>
+    public virtual int GetPlayerScore(int player)
+        => Score.TryGetPlayerScore(player, out var score) ? score : 0;
 
     private void PreviousRound()
     {
@@ -150,7 +169,7 @@ public abstract class DartsGame<T>
 
     public virtual GameState Export()
     {
-        return new GameState(GameType,
+        return new GameState(_gameType,
             new Common(
                 Players.ToArray(),
                 Score.Export(),

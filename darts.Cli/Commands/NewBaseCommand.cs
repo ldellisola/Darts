@@ -7,17 +7,24 @@ namespace Darts.Cli.Commands;
 
 public abstract class NewBaseCommand<TSettings,TGame> : Command<TSettings> where TSettings : NewGameSettings  where TGame : DartsGame<TGame>
 {
-    public NewBaseCommand(ISerializer serializer) => _serializer = serializer;
+    protected NewBaseCommand(ISerializer serializer) => _serializer = serializer;
 
     private readonly ISerializer _serializer;
     protected Layout Layout { get; set; } = new("root");
     protected TGame Game { get; private set; } = null!;
     protected bool ShowRawScore { get; private set; }
 
-    public virtual int Execute(GameState state)
-    {
-        Game = InitializeGame(state);
+    public virtual int Execute(GameState state) => ExecuteGame(InitializeGame(state));
 
+    public override int Execute(CommandContext context, TSettings settings)
+    {
+        settings.Players ??= GetPlayers();
+        return ExecuteGame(InitializeGame(settings));
+    }
+
+    protected virtual int ExecuteGame(TGame game)
+    {
+        Game = game;
         AnsiConsole.Live(Layout).Start(ct =>
         {
             do
@@ -27,24 +34,6 @@ public abstract class NewBaseCommand<TSettings,TGame> : Command<TSettings> where
             }
             while(GameLoop(Console.ReadKey(true)));
         });
-        File.WriteAllText(Path.Combine(Environment.CurrentDirectory, $"game_{DateTime.Now:yy-MM-dd-hh-mm-ss}.yml"), Export());
-        return 0;
-    }
-
-    public override int Execute(CommandContext context, TSettings settings)
-    {
-        settings.Players ??= GetPlayers();
-        Game = InitializeGame(settings);
-
-        AnsiConsole.Live(Layout).Start(ct =>
-                                       {
-                                           do
-                                           {
-                                               DrawGame();
-                                               ct.Refresh();
-                                           }
-                                           while(GameLoop(Console.ReadKey(true)));
-                                       });
         File.WriteAllText(Path.Combine(Environment.CurrentDirectory, $"game_{DateTime.Now:yy-MM-dd-hh-mm-ss}.yml"), Export());
         return 0;
     }

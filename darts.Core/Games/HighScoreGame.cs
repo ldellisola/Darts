@@ -1,33 +1,44 @@
+using Darts.Entities.GameState;
+
 namespace Darts.Core.Games;
 
-public class HighScoreGame : Game
+public class HighScoreGame : DartsGame<HighScoreGame>
 {
-    private readonly int _rounds;
-    protected override int GetPlayerScore(int player)
-    {
-        if(Score.TryGetPlayerScore(player, out var score))
-            return score;
+    public int Rounds { get; }
 
-        return 0;
+    public HighScoreGame(IReadOnlyCollection<string> players, bool isTournament, int rounds) : base(players, isTournament)
+    {
+        Rounds = rounds;
     }
 
-    protected override Dictionary<string, object?> GetGameState()
-        => new()
-           {
-               {"Rounds", _rounds}
-           };
-
-    public HighScoreGame(string[] players, int rounds) : base(new DartScore(players))
+    public HighScoreGame(GameState state) : base(state)
     {
-        _rounds = rounds;
-        OnScoreChanged += (cell) => ExecuteOnTotalScoreChanged(cell.player);
+        Rounds = int.Parse(state.GameSpecific["Rounds"].ToString()!);
     }
 
-    public override void CreateNewRound()
+    public override GameState Export()
     {
-        if (Score.TotalRounds < _rounds)
-        {
-           base.CreateNewRound();
-        }
+        var state = base.Export();
+        state.GameSpecific["Rounds"] = Rounds;
+        return state;
+    }
+
+    protected override int? SelectWinner()
+    {
+        if (TotalRounds < Rounds)
+            return null;
+
+        return Players
+            .WithIndex()
+            .Select(t=> (Player: t.Index, Score: GetPlayerScore(t.Index)))
+            .OrderByDescending(t=> t.Score)
+            .FirstOrDefault()
+            .Player;
+    }
+
+    protected override void CreateNewRound()
+    {
+        if (TotalRounds < Rounds)
+            base.CreateNewRound();
     }
 }

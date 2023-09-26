@@ -23,23 +23,15 @@ public class ClassicGame : DartsGame<ClassicGame>
         return state;
     }
 
-    private void CheckWinner()
+    protected override int? SelectWinner()
     {
-        Winner = Players
+        return Players
             .WithIndex()
             .Where(player => GetPlayerScore(player.Index) is 0)
             .Select(t => t.Index)
             .Cast<int?>()
             .FirstOrDefault();
     }
-
-    public override bool Consume(ConsoleKey key)
-    {
-        var result = base.Consume(key);
-        CheckWinner();
-        return result;
-    }
-
     public bool TryGetPossibleThrows(int player, int round, out List<DartsThrow> throws)
     {
         throws = new();
@@ -52,5 +44,5 @@ public class ClassicGame : DartsGame<ClassicGame>
         return throws.Count > 0;
     }
 
-    public int GetPlayerScore(int player) => Goal - (Score.TryGetPlayerScore(player, out var score) ? score : 0);
+    public override int GetPlayerScore(int player) => Goal - (Score.TryGetPlayerScore(player, out var score) ? score : 0);
 }

@@ -7,16 +7,15 @@ namespace Darts.Core;
 public class DartScore
 {
     private readonly List<List<string?>> _scores;
-    private readonly SimpleMathInterpreter _mathInterpreter = new();
     public string[] Players { get; }
     private readonly int _playersCount;
 
-    private int currentPlayer;
-    private int currentRound = -1;
+    private int _currentPlayer;
+    private int _currentRound = -1;
     public int TotalRounds { get; private set; }
 
-    public ScoreCell CurrentRaw => new (currentRound, currentPlayer, _scores[currentPlayer][currentRound]);
-    public ScoreCell CurrentComputed => new(currentRound, currentPlayer, SimpleMathInterpreter.TryResolve(_scores[currentPlayer][currentRound] ?? string.Empty, out var score) ? score.ToString() : null);
+    public ScoreCell CurrentRaw => new (_currentRound, _currentPlayer, _scores[_currentPlayer][_currentRound]);
+    public ScoreCell CurrentComputed => new(_currentRound, _currentPlayer, SimpleMathInterpreter.TryResolve(_scores[_currentPlayer][_currentRound] ?? string.Empty, out var score) ? score.ToString() : null);
 
     public DartScore(string[] players)
     {
@@ -33,7 +32,7 @@ public class DartScore
     {
         foreach (var playerScore in _scores)
             playerScore.Add(null);
-        currentRound++;
+        _currentRound++;
         TotalRounds++;
         return TotalRounds;
     }
@@ -45,12 +44,12 @@ public class DartScore
     /// <returns>Player/round modified with the new value</returns>
     public ScoreCell UpdatePartialScore(char score)
     {
-        if (_scores[currentPlayer][currentRound] is null)
-            _scores[currentPlayer][currentRound] = "";
+        if (_scores[_currentPlayer][_currentRound] is null)
+            _scores[_currentPlayer][_currentRound] = "";
 
-        _scores[currentPlayer][currentRound] += score;
+        _scores[_currentPlayer][_currentRound] += score;
 
-        return new(currentRound, currentPlayer, _scores[currentPlayer][currentRound]);
+        return new(_currentRound, _currentPlayer, _scores[_currentPlayer][_currentRound]);
     }
 
 
@@ -60,12 +59,12 @@ public class DartScore
     /// <returns>Player/round modified with the current value</returns>
     public ScoreCell NextPlayer()
     {
-        currentPlayer++;
-                if (currentPlayer >= _playersCount)
+        _currentPlayer++;
+                if (_currentPlayer >= _playersCount)
                 {
-                    currentPlayer = 0;
+                    _currentPlayer = 0;
                 }
-        return new(currentRound, currentPlayer, _scores[currentPlayer][currentRound]);
+        return new(_currentRound, _currentPlayer, _scores[_currentPlayer][_currentRound]);
     }
 
     /// <summary>
@@ -74,12 +73,12 @@ public class DartScore
     /// <returns>Player/round modified with the current value</returns>
     public ScoreCell PreviousPlayer()
     {
-        currentPlayer--;
-        if (currentPlayer < 0)
+        _currentPlayer--;
+        if (_currentPlayer < 0)
         {
-            currentPlayer = _playersCount - 1;
+            _currentPlayer = _playersCount - 1;
         }
-        return new(currentRound, currentPlayer, _scores[currentPlayer][currentRound]);
+        return new(_currentRound, _currentPlayer, _scores[_currentPlayer][_currentRound]);
     }
 
     /// <summary>
@@ -88,10 +87,10 @@ public class DartScore
     /// <returns>Player/round modified with the current value</returns>
     public ScoreCell? NextRound()
     {
-        if (currentRound < TotalRounds - 1)
+        if (_currentRound < TotalRounds - 1)
         {
-            currentRound++;
-            return new(currentRound, currentPlayer, _scores[currentPlayer][currentRound]);
+            _currentRound++;
+            return new(_currentRound, _currentPlayer, _scores[_currentPlayer][_currentRound]);
         }
 
         return null;
@@ -103,10 +102,10 @@ public class DartScore
     /// <returns>Player/round modified with the current value</returns>
     public ScoreCell? PreviousRound()
     {
-        if (currentRound > 0)
+        if (_currentRound > 0)
         {
-            currentRound--;
-            return new(currentRound, currentPlayer, _scores[currentPlayer][currentRound]);
+            _currentRound--;
+            return new(_currentRound, _currentPlayer, _scores[_currentPlayer][_currentRound]);
         }
 
         return null;
@@ -118,9 +117,9 @@ public class DartScore
     /// <returns>Player/round modified with the current value</returns>
     public ScoreCell DeleteScore()
     {
-        if (_scores[currentPlayer][currentRound] is not null && _scores[currentPlayer][currentRound]!.Length > 0)
-            _scores[currentPlayer][currentRound] = _scores[currentPlayer][currentRound]?[..^1];
-        return new(currentRound, currentPlayer, _scores[currentPlayer][currentRound]);
+        if (_scores[_currentPlayer][_currentRound] is not null && _scores[_currentPlayer][_currentRound]!.Length > 0)
+            _scores[_currentPlayer][_currentRound] = _scores[_currentPlayer][_currentRound]?[..^1];
+        return new(_currentRound, _currentPlayer, _scores[_currentPlayer][_currentRound]);
     }
 
 

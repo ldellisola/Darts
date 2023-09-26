@@ -1,4 +1,5 @@
 using Darts.Entities.GameState;
+using Spectre.Console;
 using Spectre.Console.Cli;
 using YamlDotNet.Serialization;
 
@@ -8,6 +9,11 @@ public class LoadGameSettings : CommandSettings
 {
     [CommandArgument(0, "<FILE>")]
     public string File { get; set; } = null!;
+
+    public override ValidationResult Validate() =>
+        System.IO.File.Exists(File) ?
+            ValidationResult.Success() :
+            ValidationResult.Error("File does not exists");
 }
 
 public class LoadGameCommand : Command<LoadGameSettings>
@@ -29,6 +35,7 @@ public class LoadGameCommand : Command<LoadGameSettings>
         return state.GameType switch
         {
             nameof(ClassicGame) => new ClassicGameCommand(_serializer).Execute(state),
+            nameof(HighScoreGame) => new HighScoreGameCommand(_serializer).Execute(state),
             _ => throw new NotSupportedException($"Game {state.GameType} is not supported")
         };
     }

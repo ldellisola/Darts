@@ -16,49 +16,49 @@ public class ClassicGameSettings : NewGameSettings
 
 public class ClassicGameCommand : NewBaseCommand<ClassicGameSettings, ClassicGame>
 {
-    private Table scoreTable = null!;
-    private readonly Table statsTable = new();
-    private bool isUIInitialized;
+    private Table _scoreTable = null!;
+    private readonly Table _statsTable = new();
+    private bool _isUiInitialized;
     protected override ClassicGame InitializeGame(ClassicGameSettings settings) => new(settings.Players!, settings.Score!.Value,settings.IsTournament);
     protected override ClassicGame InitializeGame(GameState state) => new(state);
     protected override void DrawGame()
     {
-        if (!isUIInitialized)
+        if (!_isUiInitialized)
         {
-            isUIInitialized = true;
-            scoreTable = new Table();
+            _isUiInitialized = true;
+            _scoreTable = new Table();
             Layout.SplitColumns(
-                new Layout("game", new Panel(scoreTable).Header("Classic Game to [bold]"+Game.Goal+"[/]")).Ratio(3),
-                new Layout("stats", new Panel(statsTable.AddColumn("").HideHeaders().NoBorder()).Expand().Header("Possible Throws"))
+                new Layout("game", new Panel(_scoreTable).Header("Classic Game to [bold]"+Game.Goal+"[/]")).Ratio(3),
+                new Layout("stats", new Panel(_statsTable.AddColumn("").HideHeaders().NoBorder()).Expand().Header("Possible Throws"))
                 );
         }
 
-        if (Game.Players.Count != scoreTable.Columns.Count - 1)
+        if (Game.Players.Count != _scoreTable.Columns.Count - 1)
         {
-            scoreTable = Game.Players.Aggregate(
+            _scoreTable = Game.Players.Aggregate(
                                            new Table().AddColumn("Round", t=> t.Footer("[bold]Total Score[/]")),
                                            (t, player) => t.AddColumn(player, c => c.Footer(Game.Goal.ToString(CultureInfo.InvariantCulture)))
                                            );
-            Layout.GetLayout("game").Update(new Panel(scoreTable).Header($"Classic Game to [bold]{Game.Goal}[/]"));
-            scoreTable.ShowFooters();
+            Layout.GetLayout("game").Update(new Panel(_scoreTable).Header($"Classic Game to [bold]{Game.Goal}[/]"));
+            _scoreTable.ShowFooters();
         }
 
-        statsTable.Rows.Clear();
-        Layout.GetLayout("stats").Update(new Panel(statsTable).Header($"Possible Throws for [bold]{Game.Players[Game.CurrentPlayer]}[/]").Expand()).Invisible();
+        _statsTable.Rows.Clear();
+        Layout.GetLayout("stats").Update(new Panel(_statsTable).Header($"Possible Throws for [bold]{Game.Players[Game.CurrentPlayer]}[/]").Expand()).Invisible();
         if (Game.TryGetPossibleThrows(Game.CurrentPlayer, Game.CurrentRound, out var dartsThrows))
         {
             Layout.GetLayout("stats").Visible();
-            _ = dartsThrows.Aggregate(statsTable, (t, possibleThrow) => t.AddRow(possibleThrow.ToString()));
+            _ = dartsThrows.Aggregate(_statsTable, (t, possibleThrow) => t.AddRow(possibleThrow.ToString()));
         }
 
-        while (scoreTable.Rows.Count < Game.TotalRounds)
-            scoreTable.AddRow(Enumerable.Repeat(new Markup(""), Game.Players.Count));
+        while (_scoreTable.Rows.Count < Game.TotalRounds)
+            _scoreTable.AddRow(Enumerable.Repeat(new Markup(""), Game.Players.Count));
 
         for (var p = 0; p < Game.Players.Count; p++)
         {
             for (var r = 0; r < Game.TotalRounds; r++)
             {
-                scoreTable.UpdateCell(r, 0, $"[bold]{r + 1}[/]");
+                _scoreTable.UpdateCell(r, 0, $"[bold]{r + 1}[/]");
                 if (p == Game.CurrentPlayer && r == Game.CurrentRound)
                 {
                     string? score;
@@ -67,19 +67,19 @@ public class ClassicGameCommand : NewBaseCommand<ClassicGameSettings, ClassicGam
                     else
                         Game.Score.TryGetComputedScore(p, r, out score);
 
-                    scoreTable.UpdateCell(r, p + 1, $"[reverse]{score ?? "   "}[/]");
+                    _scoreTable.UpdateCell(r, p + 1, $"[reverse]{score ?? "   "}[/]");
                 }
                 else
                 {
-                    scoreTable.UpdateCell(r, p + 1, Game.Score.TryGetComputedScore(p, r, out var score) ? score ?? "   " : "  ");
+                    _scoreTable.UpdateCell(r, p + 1, Game.Score.TryGetComputedScore(p, r, out var score) ? score ?? "   " : "  ");
                 }
             }
 
-            scoreTable.Columns[1+p].Header = new Text(Game.Players[p]);
+            _scoreTable.Columns[1+p].Header = new Text(Game.Players[p]);
             if (Game.Winner is not null && Game.Winner.Value == p)
-                scoreTable.Columns[1 + Game.Winner.Value].Footer = new Markup("[bold][green]WINNER[/][/]");
+                _scoreTable.Columns[1 + Game.Winner.Value].Footer = new Markup("[bold][green]WINNER[/][/]");
             else
-                scoreTable.Columns[1+p].Footer = new Markup(Game.GetPlayerScore(p).ToString(CultureInfo.InvariantCulture));
+                _scoreTable.Columns[1+p].Footer = new Markup(Game.GetPlayerScore(p).ToString(CultureInfo.InvariantCulture));
         }
     }
     public ClassicGameCommand(ISerializer serializer) : base(serializer)
