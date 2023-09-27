@@ -75,10 +75,9 @@ public class HighScoreGameCommand : NewBaseCommand<HighScoreGameSettings, HighSc
             }
 
             _scoreTable.Columns[1+p].Header = new Text(Game.Players[p]);
-            if (Game.Winner is not null && Game.Winner.Value == p)
-                _scoreTable.Columns[1 + Game.Winner.Value].Footer = new Markup("[bold][green]WINNER[/][/]");
-            else
-                _scoreTable.Columns[1+p].Footer = new Markup(Game.GetPlayerScore(p).ToString(CultureInfo.InvariantCulture));
+            _scoreTable.Columns[1 + p].Footer = Game.Winner is not null && Game.Winner.Value == p
+                ? new Markup("[bold][green]WINNER[/][/]")
+                : (Spectre.Console.Rendering.IRenderable)new Markup(Game.GetPlayerScore(p).ToString(CultureInfo.InvariantCulture));
         }
     }
 }

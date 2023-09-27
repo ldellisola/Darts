@@ -1,78 +1,92 @@
+using Darts.Entities.GameState;
+
 namespace Darts.Core.Games;
 
-public class BestOfGame : Game
+public class BestOfGame : DartsGame<BestOfGame>
 {
-    private readonly int _rounds;
+    public int Rounds { get; }
+    public bool IsTied { get; private set; }
 
-    public BestOfGame(int rounds, string[] players) : base(new DartScore(players))
+    public BestOfGame(IReadOnlyCollection<string> players, bool isTournament, int rounds) : base(players, isTournament)
     {
-        _rounds = rounds;
-        OnScoreChanged += _ => UpdateAllPlayerScores();
+        Rounds = rounds;
     }
 
-    protected override int GetPlayerScore(int player)
+    public BestOfGame(GameState state) : base(state)
+    {
+        Rounds = int.TryParse(state.GameSpecific["Rounds"].ToString(), out var rounds)
+            ? rounds
+            : 3;
+    }
+
+    public override GameState Export()
+    {
+        var state = base.Export();
+        state.GameSpecific["Rounds"] = Rounds;
+        return state;
+    }
+
+    protected override void CreateNewRound()
+    {
+        if (TotalRounds < Rounds || IsTied)
+            base.CreateNewRound();
+    }
+
+    public override int GetPlayerScore(int player)
     {
         var roundsWon = 0;
-        for (var round = 0; round < Score.TotalRounds; round++)
+        for (var round = 0; round < TotalRounds; round++)
         {
-            var bestScore = (Score: 0, Player: -1);
-            for (var p = 0; p < Score.Players.Length; p++)
-            {
-                if (Score.TryGetPlayerScore(p, round, out var score) && score > bestScore.Score)
-                {
-                    bestScore = (score, p);
-                }
-            }
-            if (bestScore.Player == player)
+            var scores = Players
+                .Select((_, i) => Score.TryGetComputedScore(i, round, out var score) ? int.Parse(score!) : 0)
+                .ToArray();
+
+            if (scores[player] is not 0 && scores[player] == scores.Max())
                 roundsWon++;
         }
 
         return roundsWon;
     }
 
-    private void UpdateAllPlayerScores()
+
+    protected override int? SelectWinner()
     {
-        var roundsWon = Score.Players.Select((_, i) => ExecuteOnTotalScoreChanged(i)).WithIndex().ToArray();
-        var maxWins = (_rounds / 2) + 1;
+        IsTied = false;
+        var playerScores = Players.WithIndex()
+            .Select(t => GetPlayerScore(t.Index))
+            .ToArray();
 
-        foreach (var (i, score) in roundsWon)
-        {
-            if (score >= maxWins)
-            {
-                Winner = i;
-                break;
-            }
+        var maxWins = (TotalRounds / 2) + 1;
+        var maxScore = playerScores.WithIndex().MaxBy(t=> t.Value);
 
-            var remaining = _rounds - roundsWon.Sum(t=> t.Value);
-            var canAnyPlayerSurpass = false;
-            for (var j = 0; j < roundsWon.Length; j++)
-            {
-                if (i != j && roundsWon[j].Value + remaining > roundsWon[i].Value)
-                {
-                    canAnyPlayerSurpass = true;
-                    break;
-                }
-            }
+        if (maxScore.Value >= maxWins)
+            return maxScore.Index;
 
-            if (!canAnyPlayerSurpass)
-            {
-                Winner = i;
-                // break;
-            }
-        }
+        var remainingRounds = Math.Min(0,Rounds - TotalRounds);
+
+        var possibleWinners = Players
+            .WithIndex()
+            .Where(t =>
+                playerScores
+                    .WithIndex()
+                    .All(r => r.Index == t.Index || playerScores[t.Index] >= (r.Value + remainingRounds))
+            )
+            .Select(t=> (t.Index, Score: base.GetPlayerScore(t.Index)))
+            .OrderByDescending(t=> t.Score)
+            .ToArray();
+
+
+        if (possibleWinners.Length is 0)
+            return null;
+
+        possibleWinners = possibleWinners
+            .TakeWhile(t => t.Score == possibleWinners.First().Score)
+            .ToArray();
+
+        if (possibleWinners.Length is 1)
+            return possibleWinners.First().Index;
+
+        IsTied = true;
+        return null;
     }
-
-    public override void CreateNewRound()
-    {
-        if (Score.TotalRounds < _rounds)
-        {
-            base.CreateNewRound();
-        }
-    }
-
-    protected override Dictionary<string, object?> GetGameState()
-        => new()
-        {
-            {"Rounds", _rounds}
-        };
 }

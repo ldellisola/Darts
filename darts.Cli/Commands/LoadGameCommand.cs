@@ -36,6 +36,7 @@ public class LoadGameCommand : Command<LoadGameSettings>
         {
             nameof(ClassicGame) => new ClassicGameCommand(_serializer).Execute(state),
             nameof(HighScoreGame) => new HighScoreGameCommand(_serializer).Execute(state),
+            nameof(BestOfGame) => new BestOfGameCommand(_serializer).Execute(state),
             _ => throw new NotSupportedException($"Game {state.GameType} is not supported")
         };
     }

@@ -1,3 +1,3 @@
 namespace Darts.Entities;
 
-public readonly record struct CellCoordinate(int round, int player);
+public readonly record struct CellCoordinate(int Round, int Player);

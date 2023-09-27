@@ -8,11 +8,11 @@ public static class DartBoard
 
     public static void Initialize(KnockoutGame game, string[] players)
     {
-        game.OnPlayerEliminated += (player) => _ = Table.UpdateCell(player.round, player.player + 1, $"[red]{player.value}[/]");
-        game.OnScoreChanged += (tuple) => UpdateTableCell(tuple.round, tuple.player, tuple.value);
+        game.OnPlayerEliminated += (player) => _ = Table.UpdateCell(player.Round, player.Player + 1, $"[red]{player.Value}[/]");
+        game.OnScoreChanged += (tuple) => UpdateTableCell(tuple.Round, tuple.Player, tuple.Value);
         game.OnRoundAdded += AddTableRow;
-        game.OnScoreSelected += cell => SelectCell(cell.round,cell.player, cell.value is not null && game.IsPlayerEliminated(cell.player) ? $"[red]{cell.value}[/]": cell.value);
-        game.OnScoreDeselected += cell => DeselectCell(cell.round,cell.player, cell.value is not null && game.IsPlayerEliminated(cell.player) ? $"[red]{cell.value}[/]": cell.value);
+        game.OnScoreSelected += cell => SelectCell(cell.Round,cell.Player, cell.Value is not null && game.IsPlayerEliminated(cell.Player) ? $"[red]{cell.Value}[/]": cell.Value);
+        game.OnScoreDeselected += cell => DeselectCell(cell.Round,cell.Player, cell.Value is not null && game.IsPlayerEliminated(cell.Player) ? $"[red]{cell.Value}[/]": cell.Value);
 
         _ = Table.AddColumn("Round");
         foreach (var player in players)
@@ -23,10 +23,10 @@ public static class DartBoard
 
     public static void Initialize(Game game, string[] players)
     {
-        game.OnScoreChanged += (tuple) => UpdateTableCell(tuple.round, tuple.player, tuple.value);
+        game.OnScoreChanged += (tuple) => UpdateTableCell(tuple.Round, tuple.Player, tuple.Value);
         game.OnRoundAdded += AddTableRow;
-        game.OnScoreSelected += cell => SelectCell(cell.round,cell.player, cell.value);
-        game.OnScoreDeselected += cell => DeselectCell(cell.round,cell.player, cell.value);
+        game.OnScoreSelected += cell => SelectCell(cell.Round,cell.Player, cell.Value);
+        game.OnScoreDeselected += cell => DeselectCell(cell.Round,cell.Player, cell.Value);
         game.OnPlayerWon += MarkPlayerAsWinner;
 
         _ = Table.AddColumn("Round");

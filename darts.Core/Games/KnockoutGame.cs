@@ -75,7 +75,7 @@ public class KnockoutGame : Game
         {
             base.GoToNextPlayer();
         }
-        while (IsPlayerEliminated(Score.CurrentRaw.player) && Score.CurrentRaw.value is null);
+        while (IsPlayerEliminated(Score.CurrentRaw.Player) && Score.CurrentRaw.Value is null);
     }
 
     public override void GoToPreviousPlayer()
@@ -84,14 +84,14 @@ public class KnockoutGame : Game
         {
             base.GoToPreviousPlayer();
         }
-        while (IsPlayerEliminated(Score.CurrentRaw.player) && Score.CurrentRaw.value is null);
+        while (IsPlayerEliminated(Score.CurrentRaw.Player) && Score.CurrentRaw.Value is null);
     }
 
 
     public override void GoToNextRound()
     {
         base.GoToNextRound();
-        if (IsPlayerEliminated(Score.CurrentRaw.player) && Score.CurrentRaw.value is null)
+        if (IsPlayerEliminated(Score.CurrentRaw.Player) && Score.CurrentRaw.Value is null)
         {
             base.GoToPreviousRound();
         }

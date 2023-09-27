@@ -38,6 +38,7 @@ public abstract class DartsGame<T>
     {
         _isTournament = state.Common.IsTournament;
         Players = state.Common.Players.ToList();
+        Winner = state.Common.Winner;
         Score = DartScore2.Import(state.Common.Scores, state.Common.Players.Length, state.Common.Rounds);
     }
 

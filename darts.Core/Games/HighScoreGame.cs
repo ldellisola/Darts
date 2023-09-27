@@ -5,6 +5,7 @@ namespace Darts.Core.Games;
 public class HighScoreGame : DartsGame<HighScoreGame>
 {
     public int Rounds { get; }
+    public bool IsTied { get; private set; }
 
     public HighScoreGame(IReadOnlyCollection<string> players, bool isTournament, int rounds) : base(players, isTournament)
     {
@@ -25,20 +26,26 @@ public class HighScoreGame : DartsGame<HighScoreGame>
 
     protected override int? SelectWinner()
     {
+        IsTied = false;
         if (TotalRounds < Rounds)
             return null;
 
-        return Players
-            .WithIndex()
-            .Select(t=> (Player: t.Index, Score: GetPlayerScore(t.Index)))
-            .OrderByDescending(t=> t.Score)
-            .FirstOrDefault()
-            .Player;
+        var scores = Players
+            .Select((_, p) => GetPlayerScore(p))
+            .ToArray();
+
+        var bestScore = scores.Max();
+
+        if (scores.Count(t => t == bestScore) is 1)
+            return scores.WithIndex().First(t => t.Value == bestScore).Index;
+
+        IsTied = true;
+        return null;
     }
 
     protected override void CreateNewRound()
     {
-        if (TotalRounds < Rounds)
+        if (TotalRounds < Rounds || IsTied)
             base.CreateNewRound();
     }
 }
