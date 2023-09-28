@@ -1,46 +1,58 @@
-﻿using Spectre.Console;
+﻿using Darts.Entities.GameState;
+using Spectre.Console;
 using Spectre.Console.Cli;
+using YamlDotNet.Serialization;
 
 namespace Darts.Cli.Commands;
 
-public abstract class BaseCommand<T> : Command<T> where T : NewGameSettings
+public abstract class BaseCommand<TSettings,TGame> : Command<TSettings> where TSettings : NewGameSettings  where TGame : DartsGame<TGame>
 {
-    public override int Execute(CommandContext context, T settings)
+    protected BaseCommand(ISerializer serializer) => _serializer = serializer;
+
+    private readonly ISerializer _serializer;
+    protected Layout Layout { get; set; } = new("root");
+    protected TGame Game { get; private set; } = null!;
+    protected bool ShowRawScore { get; private set; }
+
+    public virtual int Execute(GameState state) => ExecuteGame(InitializeGame(state));
+
+    public override int Execute(CommandContext context, TSettings settings)
     {
         settings.Players ??= GetPlayers();
+        return ExecuteGame(InitializeGame(settings));
+    }
 
-        var (game, table, panel) = InitializeGame(settings);
-
-        var layout = new Layout("Root")
-            .SplitColumns(
-                new Layout("GameBoard", table).Ratio(3),
-                new Layout("PlayerStats", Align.Left((panel ?? new("")).Expand()))
-            );
-
-        if (panel is null)
-            layout["PlayerStats"].Invisible();
-
-        game.Start();
-        AnsiConsole.Live(layout)
-                   .Start(ct =>
-                   {
-                                          while(true)
-                                          {
-                                              ct.Refresh();
-                                              var ch = Console.ReadKey(true);
-                                              if(ch is { KeyChar: 'q' })
-                                              {
-                                                  break;
-                                              }
-
-                                          }
-
-                   });
-        File.WriteAllText(Path.Combine(Environment.CurrentDirectory, $"game_{DateTime.Now:yy-MM-dd-hh-mm-ss}.json"), game.ToJson());
+    protected virtual int ExecuteGame(TGame game)
+    {
+        Game = game;
+        AnsiConsole.Live(Layout).Start(ct =>
+        {
+            do
+            {
+                DrawGame();
+                ct.Refresh();
+            }
+            while(GameLoop(Console.ReadKey(true)));
+        });
+        File.WriteAllText(Path.Combine(Environment.CurrentDirectory, $"game_{DateTime.Now:yy-MM-dd-hh-mm-ss}.yml"), Export());
         return 0;
     }
 
-    protected abstract (Game, Table, Panel?) InitializeGame(T settings);
+    protected virtual bool GameLoop(ConsoleKeyInfo ch)
+    {
+        ShowRawScore = ch.Key == ConsoleKey.Spacebar
+                       || char.IsDigit(ch.KeyChar)
+                       || ch.Key == ConsoleKey.Backspace
+                       || ch.Key == ConsoleKey.Multiply
+                       || ch.Key == ConsoleKey.Add;
+
+        return Game.Consume(ch.Key);
+    }
+
+    protected abstract TGame InitializeGame(TSettings settings);
+    protected abstract TGame InitializeGame(GameState state);
+
+    protected abstract void DrawGame();
 
     private static string[] GetPlayers()
     {
@@ -57,5 +69,11 @@ public abstract class BaseCommand<T> : Command<T> where T : NewGameSettings
         }
 
         return players.ToArray();
+    }
+
+    private string Export()
+    {
+        var state = Game.Export();
+        return _serializer.Serialize(state);
     }
 }

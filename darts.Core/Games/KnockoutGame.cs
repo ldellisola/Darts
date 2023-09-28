@@ -1,110 +1,82 @@
-using Darts.Entities;
+using Darts.Entities.GameState;
 
 namespace Darts.Core.Games;
 
-public class KnockoutGame : Game
+public class KnockoutGame : DartsGame<KnockoutGame>
 {
-    private readonly int _dropLast;
+    public int DropLast { get; }
+    public bool[] PlayerStatus { get; private set; }
 
-    public event Action<ScoreCell>? OnPlayerEliminated;
-    private bool[] _playerStatus;
-
-    public KnockoutGame(string[] players, int dropLast) : base(new DartScore(players))
+    public KnockoutGame(IReadOnlyCollection<string> players, bool isTournament, int dropLast) : base(players, isTournament)
     {
-        _dropLast = dropLast;
-        _playerStatus = new bool[players.Length];
+        DropLast = dropLast;
+        PlayerStatus = new bool[players.Count];
     }
 
-    public bool IsPlayerEliminated(int player) => _playerStatus[player];
-
-
-    protected override int ExecuteOnTotalScoreChanged(int player)
+    public KnockoutGame(GameState state) : base(state)
     {
-        // var playerScore = GetPlayerScore(player);
-        // OnTotalScoreChanged?.Invoke(player, playerScore);
-        return 0;
+        PlayerStatus = new bool[state.Common.Players.Length];
+        DropLast = int.TryParse(state.GameSpecific["DropLast"].ToString(), out var dropLast) ? dropLast : 1;
     }
 
-    private void RefreshEliminatedPlayers(int totalRounds, int playersLength)
+    public override GameState Export()
     {
-        _playerStatus = new bool[playersLength];
-
-        for (int round = 0; round < totalRounds; round++)
-        {
-            var playerScores = new List<(int Player, int Score)>();
-
-            foreach (var (i, _) in Score.Players.WithIndex())
-            {
-                if (Score.TryGetPlayerScore(i, round, out var score))
-                {
-                    playerScores.Add((i, score));
-                }
-                else if (!IsPlayerEliminated(i))
-                {
-                    playerScores.Clear();
-                    break;
-                }
-            }
-
-            playerScores.Sort((a, b) => a.Score.CompareTo(b.Score)); // Sort in ascending order of scores
-
-            // Take the first N players (lowest scores) to eliminate
-            foreach (var eliminated in playerScores.Take(Math.Min(_dropLast, playerScores.Count-1)))
-            {
-                OnPlayerEliminated?.Invoke(new ScoreCell(round, eliminated.Player, eliminated.Score.ToString()));
-                _playerStatus[eliminated.Player] = true;
-            }
-        }
-
-        if (_playerStatus.Count(t=> !t) == 1)
-            Winner = _playerStatus.ToList().IndexOf(false);
+        var state = base.Export();
+        state.GameSpecific["DropLast"] = DropLast;
+        return state;
     }
 
-    // public void Consume(ConsoleKeyInfo keyInfo)
-    // {
-    //     base.Consume(keyInfo);
-    //     if (keyInfo.Key == ConsoleKey.Enter)
-    //     {
-    //         RefreshEliminatedPlayers(Score.TotalRounds, Score.Players.Length);
-    //     }
-    // }
-
-    public override void GoToNextPlayer()
+    protected override void NextPlayer()
     {
         do
         {
-            base.GoToNextPlayer();
-        }
-        while (IsPlayerEliminated(Score.CurrentRaw.Player) && Score.CurrentRaw.Value is null);
+            base.NextPlayer();
+        } while (IsPlayerEliminated(CurrentPlayer) && !Score.TryGetRawScore(CurrentPlayer, CurrentRound, out _));
     }
 
-    public override void GoToPreviousPlayer()
+    protected override void PreviousPlayer()
     {
         do
         {
-            base.GoToPreviousPlayer();
-        }
-        while (IsPlayerEliminated(Score.CurrentRaw.Player) && Score.CurrentRaw.Value is null);
+            base.PreviousPlayer();
+        } while (IsPlayerEliminated(CurrentPlayer) && !Score.TryGetRawScore(CurrentPlayer, CurrentRound, out _));
     }
 
-
-    public override void GoToNextRound()
+    protected override void NextRound()
     {
-        base.GoToNextRound();
-        if (IsPlayerEliminated(Score.CurrentRaw.Player) && Score.CurrentRaw.Value is null)
+        base.NextRound();
+        if (IsPlayerEliminated(CurrentPlayer) && !Score.TryGetRawScore(CurrentPlayer, CurrentRound, out _))
+            PreviousRound();
+    }
+
+    protected override void AddPlayer()
+    {
+        base.AddPlayer();
+        PlayerStatus = PlayerStatus.Append(false).ToArray();
+        Winner = SelectWinner();
+    }
+
+    public bool IsPlayerEliminated(int player) => PlayerStatus[player];
+
+    protected override int? SelectWinner()
+    {
+        PlayerStatus = new bool[Players.Count];
+
+        for (var round = 0; round < TotalRounds-1; round++)
         {
-            base.GoToPreviousRound();
+            var droppedPlayers = Players
+                .Select((_, i) => Score.TryGetComputedScore(i, round, out var score) ? int.Parse(score!) : (int?)null)
+                .WithIndex()
+                .Where(t => t.Value is not null && !IsPlayerEliminated(t.Index))
+                .OrderByDescending(t => t.Value)
+                .TakeLast(DropLast);
+
+            foreach (var (i,_) in droppedPlayers)
+            {
+                PlayerStatus[i] = true;
+            }
         }
-    }
 
-    protected override int GetPlayerScore(int player)
-    {
-        throw new NotSupportedException("Knockout game does not support player score");
+        return PlayerStatus.Count(t => !t) is 1 ? PlayerStatus.WithIndex().First(t => !t.Value).Index : null;
     }
-
-    protected override Dictionary<string, object?> GetGameState()
-        => new()
-           {
-               {"DropLast", _dropLast},
-           } ;
 }

@@ -29,7 +29,7 @@ public class NewGameCommand : Command<NewGameSettings>
         return gameName.ToLowerInvariant() switch
         {
             "classic" => new ClassicGameCommand(_serializer).Execute(context, new ClassicGameSettings { Players = settings.Players }),
-            "knockout" => new KnockoutGameCommand().Execute(context, new KnockoutGameSettings { Players = settings.Players }),
+            "knockout" => new KnockoutGameCommand(_serializer).Execute(context, new KnockoutGameSettings { Players = settings.Players }),
             "highscore" => new HighScoreGameCommand(_serializer).Execute(context, new HighScoreGameSettings { Players = settings.Players }),
             "best-of" => new BestOfGameCommand(_serializer).Execute(context,new BestOfGameSettings {Players = settings.Players }),
             _ => throw new NotSupportedException($"Game {gameName} is not supported")

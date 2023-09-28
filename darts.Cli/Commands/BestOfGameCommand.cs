@@ -14,7 +14,7 @@ public class BestOfGameSettings : NewGameSettings
     public int Rounds { get; set; }
 }
 
-public class BestOfGameCommand : NewBaseCommand<BestOfGameSettings, BestOfGame>
+public class BestOfGameCommand : BaseCommand<BestOfGameSettings, BestOfGame>
 {
     private Table _scoreTable = null!;
     private bool _isUiInitialized;

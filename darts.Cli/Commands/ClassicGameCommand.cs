@@ -14,7 +14,7 @@ public class ClassicGameSettings : NewGameSettings
     public int? Score { get; set; }
 }
 
-public class ClassicGameCommand : NewBaseCommand<ClassicGameSettings, ClassicGame>
+public class ClassicGameCommand : BaseCommand<ClassicGameSettings, ClassicGame>
 {
     private Table _scoreTable = null!;
     private readonly Table _statsTable = new();

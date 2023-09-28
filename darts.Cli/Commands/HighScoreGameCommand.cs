@@ -14,7 +14,7 @@ public class HighScoreGameSettings : NewGameSettings
     public int Rounds { get; set; }
 }
 
-public class HighScoreGameCommand : NewBaseCommand<HighScoreGameSettings, HighScoreGame>
+public class HighScoreGameCommand : BaseCommand<HighScoreGameSettings, HighScoreGame>
 {
     private Table _scoreTable = null!;
     private bool _isUiInitialized;

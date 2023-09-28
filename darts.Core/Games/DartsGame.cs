@@ -104,7 +104,7 @@ public abstract class DartsGame<T>
             ;
     }
 
-    private void AddPlayer()
+    protected virtual void AddPlayer()
     {
         Players.Add("");
         Score.AddPlayer();
@@ -144,25 +144,25 @@ public abstract class DartsGame<T>
     public virtual int GetPlayerScore(int player)
         => Score.TryGetPlayerScore(player, out var score) ? score : 0;
 
-    private void PreviousRound()
+    protected virtual void PreviousRound()
     {
         if (CurrentRound > 0)
             CurrentRound--;
     }
 
-    private void NextRound()
+    protected virtual void NextRound()
     {
         if (CurrentRound < TotalRounds - 1)
             CurrentRound++;
     }
 
-    private void NextPlayer()
+    protected virtual void NextPlayer()
     {
         if(++CurrentPlayer >= Players.Count)
             CurrentPlayer = 0;
     }
 
-    private void PreviousPlayer()
+    protected virtual void PreviousPlayer()
     {
         if(--CurrentPlayer < 0)
             CurrentPlayer = Players.Count - 1;
